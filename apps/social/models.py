@@ -1,8 +1,8 @@
 from django.db import models
 
 class Follow(models.Model):
-    follower = models.ForeignKey('User', models.DO_NOTHING)
-    following = models.ForeignKey('User', models.DO_NOTHING, related_name='follow_following_set')
+    follower = models.ForeignKey('users.User', models.DO_NOTHING)
+    following = models.ForeignKey('users.User', models.DO_NOTHING, related_name='follow_following_set')
     created_at = models.DateTimeField()
 
     class Meta:
@@ -12,9 +12,9 @@ class Follow(models.Model):
 
 
 class Like(models.Model):
-    user = models.ForeignKey('User', models.DO_NOTHING)
-    post = models.ForeignKey('Post', models.DO_NOTHING, blank=True, null=True)
-    review = models.ForeignKey('Review', models.DO_NOTHING, blank=True, null=True)
+    user = models.ForeignKey('users.User', models.DO_NOTHING)
+    post = models.ForeignKey('posts.Post', models.DO_NOTHING, blank=True, null=True)
+    review = models.ForeignKey('reviews.Review', models.DO_NOTHING, blank=True, null=True)
     created_at = models.DateTimeField()
 
     class Meta:

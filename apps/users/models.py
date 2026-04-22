@@ -29,7 +29,7 @@ class User(models.Model):
 
 class UserGameList(models.Model):
     user = models.ForeignKey(User, models.DO_NOTHING)
-    game = models.ForeignKey('Game', models.DO_NOTHING)
+    game = models.ForeignKey('games.Game', models.DO_NOTHING)
     status = models.CharField(max_length=50)
     hours_played = models.DecimalField(max_digits=8, decimal_places=2)
     added_at = models.DateTimeField()

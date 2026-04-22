@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Post(models.Model):
-    author = models.ForeignKey('User', models.DO_NOTHING)
+    author = models.ForeignKey('users.User', models.DO_NOTHING)
     title = models.CharField(max_length=255)
     content = models.TextField()
     image = models.CharField(max_length=512, blank=True, null=True)
@@ -18,7 +18,7 @@ class Post(models.Model):
 
 class Comment(models.Model):
     post = models.ForeignKey('Post', models.DO_NOTHING)
-    author = models.ForeignKey('User', models.DO_NOTHING)
+    author = models.ForeignKey('users.User', models.DO_NOTHING)
     content = models.TextField()
     created_at = models.DateTimeField()
 
