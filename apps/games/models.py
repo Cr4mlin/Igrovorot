@@ -9,7 +9,6 @@ class Game(models.Model):
     developer = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'game'
 
 
@@ -19,7 +18,6 @@ class GameGenre(models.Model):
     genre = models.ForeignKey('Genre', models.DO_NOTHING)
 
     class Meta:
-        managed = False
         db_table = 'game_genre'
 
 
@@ -28,5 +26,4 @@ class Genre(models.Model):
     slug = models.CharField(unique=True, max_length=120)
 
     class Meta:
-        managed = False
         db_table = 'genre'

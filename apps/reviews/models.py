@@ -1,7 +1,8 @@
 from django.db import models
+from django.conf import settings
 
 class Review(models.Model):
-    author = models.ForeignKey('users.User', models.DO_NOTHING)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, models.DO_NOTHING)
     game = models.ForeignKey('games.Game', models.DO_NOTHING)
     rating = models.SmallIntegerField()
     content = models.TextField(blank=True, null=True)
@@ -9,6 +10,5 @@ class Review(models.Model):
     updated_at = models.DateTimeField()
 
     class Meta:
-        managed = False
         db_table = 'review'
         unique_together = (('author', 'game'),)
