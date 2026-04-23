@@ -21,8 +21,8 @@ class Profile(models.Model):
 class User(AbstractUser):
     email = models.EmailField(unique=True)
 
-    USERNAME_FIELD = 'email'  # вход по email
-    REQUIRED_FIELDS = ['username']  # username всё ещё обязателен
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
 
     class Meta:
         db_table = 'user'
