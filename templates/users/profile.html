@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ profile_user.username }} — GameNet{% endblock %}
+{% block title %}{{ profile_user.username }} — Igrovorot{% endblock %}
 
 {% block content %}
 <div class="profile">
@@ -30,6 +30,10 @@
 
             {% if profile.is_banned %}
                 <p class="profile__banned">Аккаунт заблокирован</p>
+            {% endif %}
+
+            {% if request.user == profile_user %}
+                <a href="{% url 'profile_edit' %}">Редактировать профиль</a>
             {% endif %}
         </div>
     </div>

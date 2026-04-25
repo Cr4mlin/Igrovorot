@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Редактировать профиль — Igrovorot{% endblock %}
+
+{% block content %}
+<div class="profile-edit">
+    <h1>Редактировать профиль</h1>
+
+    <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+
+        {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                    {% for error in field.errors %}
+                        <span class="form-error">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <div class="form-actions">
+            <button type="submit">Сохранить</button>
+            <a href="{% url 'profile' username=request.user.username %}">Отмена</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

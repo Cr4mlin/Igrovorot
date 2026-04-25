@@ -8,7 +8,8 @@ from django.utils.encoding import force_bytes, force_str
 from django.contrib.auth.tokens import default_token_generator
 from django.conf import settings
 from django.views import View
-from users.forms import RegisterForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+from users.forms import RegisterForm, ProfileEditForm
 from users.models import User, Profile
 
 
@@ -90,3 +91,22 @@ class ProfileView(View):
             'profile_user': profile_user,
             'profile': profile,
         })
+
+
+class ProfileEditView(LoginRequiredMixin, View):
+    template_name = 'users/profile_edit.html'
+    login_url = '/accounts/login/'
+
+    def get(self, request):
+        profile, _ = Profile.objects.get_or_create(user=request.user)
+        form = ProfileEditForm(instance=profile)
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request):
+        profile, _ = Profile.objects.get_or_create(user=request.user)
+        form = ProfileEditForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Профиль обновлён.')
+            return redirect('profile', username=request.user.username)
+        return render(request, self.template_name, {'form': form})
