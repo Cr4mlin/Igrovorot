@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
@@ -9,7 +9,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.conf import settings
 from django.views import View
 from users.forms import RegisterForm
-from users.models import User
+from users.models import User, Profile
 
 
 
@@ -79,3 +79,14 @@ class LogoutView(View):
     def get(self, request):
         logout(request)
         return redirect('login')
+
+class ProfileView(View):
+    template_name = 'users/profile.html'
+
+    def get(self, request, username):
+        profile_user = get_object_or_404(User, username=username)
+        profile, _ = Profile.objects.get_or_create(user=profile_user)
+        return render(request, self.template_name, {
+            'profile_user': profile_user,
+            'profile': profile,
+        })
