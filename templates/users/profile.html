@@ -20,10 +20,10 @@
 
             <div class="profile__meta">
                 {% if profile.birth_date %}
-                    <span class="profile__meta-item">Дата рождения: {{ profile.birth_date }}</span>
+                    <span class="profile__meta-item">Дата рождения: {{ profile.birth_date|date:"d.m.Y" }}</span>
                 {% endif %}
                 {% if profile.steam_id %}
-                    <span class="profile__meta-item">Steam: {{ profile.steam_id }}</span>
+                    <span class="profile__meta-item">Steam ID: {{ profile.steam_id }}</span>
                 {% endif %}
                 <span class="profile__meta-item">На сайте с: {{ profile_user.date_joined|date:"d.m.Y" }}</span>
             </div>

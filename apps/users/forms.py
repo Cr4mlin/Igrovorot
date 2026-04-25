@@ -24,7 +24,19 @@ class ProfileEditForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ('avatar', 'bio', 'birth_date', 'steam_id')
+        labels = {
+            'avatar': 'Аватар',
+            'bio': 'О себе',
+            'birth_date': 'Дата рождения',
+            'steam_id': 'Steam ID',
+        }
         widgets = {
+            'bio': forms.Textarea(attrs={
+                'rows': 4,
+                'placeholder': 'Расскажите о себе...',
+            }),
             'birth_date': forms.DateInput(attrs={'type': 'date'}),
-            'bio': forms.Textarea(attrs={'rows': 4}),
+            'steam_id': forms.TextInput(attrs={
+                'placeholder': 'Ваш Steam ID или ссылка на профиль',
+            }),
         }
