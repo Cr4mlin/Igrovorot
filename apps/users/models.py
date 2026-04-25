@@ -43,8 +43,8 @@ class User(AbstractUser):
 
 
 class UserGameList(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, models.DO_NOTHING)
-    game = models.ForeignKey('games.Game', models.DO_NOTHING)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    game = models.ForeignKey('games.Game', on_delete=models.CASCADE)
     status = models.CharField(max_length=50)
     hours_played = models.DecimalField(max_digits=8, decimal_places=2)
     added_at = models.DateTimeField()
