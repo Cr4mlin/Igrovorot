@@ -21,14 +21,13 @@ class Profile(models.Model):
 class User(AbstractUser):
     email = models.EmailField(unique=True)
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
+    REQUIRED_FIELDS = ['email']
 
     class Meta:
         db_table = 'user'
 
     def __str__(self):
-        return self.email
+        return self.username
 
 
 class UserGameList(models.Model):

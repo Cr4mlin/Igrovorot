@@ -30,8 +30,8 @@ class RegisterView(View):
                 f'/accounts/verify-email/{uid}/{token}/'
             )
             send_mail(
-                subject='Подтверждение регистрации',
-                message=f'Перейди по ссылке для подтверждения: {verify_url}',
+                subject='Email verification - Igrovorot',
+                message=f'Click to verify your email: {verify_url}',
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[user.email],
             )
