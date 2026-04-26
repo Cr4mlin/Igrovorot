@@ -11,7 +11,13 @@
             <a href="{% url 'profile' post.author.username %}">{{ post.author.username }}</a>
             <span>{{ post.created_at|date:"d.m.Y" }}</span>
             {% if post.tags %}
-                <span class="post-detail__tags">{{ post.tags }}</span>
+                <span class="post-detail__tags">
+                    {% for tag in post.tags.split %}
+                        {% with tag_clean=tag|cut:"," %}
+                            <a href="{% url 'post_list' %}?tag={{ tag_clean }}">{{ tag_clean }}</a>
+                        {% endwith %}
+                    {% endfor %}
+                </span>
             {% endif %}
         </div>
     </div>

@@ -13,11 +13,14 @@ class PostListView(View):
     paginate_by = 10
 
     def get(self, request):
+        tag = request.GET.get('tag', '').strip()
         posts = Post.objects.filter(is_published=True).order_by('-created_at')
+        if tag:
+            posts = posts.filter(tags__icontains=tag)
         paginator = Paginator(posts, self.paginate_by)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
-        return render(request, self.template_name, {'page_obj': page_obj})
+        return render(request, self.template_name, {'page_obj': page_obj, 'current_tag': tag})
 
 
 class PostDetailView(View):
