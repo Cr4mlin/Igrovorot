@@ -47,6 +47,7 @@ class PostDetailView(View):
             comment = form.save(commit=False)
             comment.post = post
             comment.author = request.user
+            comment.created_at = timezone.now()
             comment.save()
             return redirect('post_detail', pk=pk)
         comments = post.comment_set.select_related('author').order_by('created_at')
