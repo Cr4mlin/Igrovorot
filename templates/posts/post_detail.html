@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ post.title }} — Igrovorot{% endblock %}
+
+{% block content %}
+<div class="post-detail">
+
+    <div class="post-detail__header">
+        <h1 class="post-detail__title">{{ post.title }}</h1>
+        <div class="post-detail__meta">
+            <a href="{% url 'profile' post.author.username %}">{{ post.author.username }}</a>
+            <span>{{ post.created_at|date:"d.m.Y" }}</span>
+            {% if post.tags %}
+                <span class="post-detail__tags">{{ post.tags }}</span>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if post.image %}
+        <img class="post-detail__image" src="{{ post.image }}" alt="{{ post.title }}">
+    {% endif %}
+
+    <div class="post-detail__content">{{ post.content|linebreaks }}</div>
+
+</div>
+
+<section class="comments">
+    <h2>Комментарии ({{ comments.count }})</h2>
+
+    {% if comments %}
+        <ul class="comments__list">
+            {% for comment in comments %}
+                <li class="comments__item">
+                    <div class="comments__author">
+                        <a href="{% url 'profile' comment.author.username %}">{{ comment.author.username }}</a>
+                        <span class="comments__date">{{ comment.created_at|date:"d.m.Y" }}</span>
+                    </div>
+                    <p class="comments__content">{{ comment.content }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="comments__empty">Комментариев пока нет.</p>
+    {% endif %}
+
+    {% if request.user.is_authenticated %}
+        <div class="comments__form">
+            <h3>Оставить комментарий</h3>
+            <form method="post">
+                {% csrf_token %}
+                {{ form }}
+                <button type="submit">Отправить</button>
+            </form>
+        </div>
+    {% else %}
+        <p><a href="{% url 'login' %}">Войдите</a>, чтобы оставить комментарий.</p>
+    {% endif %}
+
+</section>
+{% endblock %}
