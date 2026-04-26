@@ -18,6 +18,7 @@
 
     {% if can_edit %}
         <a href="{% url 'post_edit' post.pk %}">Редактировать</a>
+        <a href="{% url 'post_delete' post.pk %}">Удалить</a>
     {% endif %}
 
     {% if post.image %}

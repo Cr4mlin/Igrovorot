@@ -104,6 +104,26 @@ class PostEditView(LoginRequiredMixin, View):
         return render(request, self.template_name, {'form': form, 'post': post})
 
 
+class PostDeleteView(LoginRequiredMixin, View):
+    login_url = '/accounts/login/'
+
+    def _get_post_or_403(self, request, pk):
+        post = get_object_or_404(Post, pk=pk)
+        is_moderator = request.user.groups.filter(name='Moderator').exists()
+        if post.author != request.user and not is_moderator:
+            raise PermissionDenied
+        return post
+
+    def get(self, request, pk):
+        post = self._get_post_or_403(request, pk)
+        return render(request, 'posts/post_confirm_delete.html', {'post': post})
+
+    def post(self, request, pk):
+        post = self._get_post_or_403(request, pk)
+        post.delete()
+        return redirect('post_list')
+
+
 class FeedView(View):
     template_name = 'posts/feed.html'
     paginate_by = 10
