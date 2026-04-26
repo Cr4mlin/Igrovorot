@@ -1,8 +1,10 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
 from django.core.paginator import Paginator
+from django.utils import timezone
 from posts.models import Post
-from posts.forms import CommentForm
+from posts.forms import PostForm, CommentForm
 
 
 class PostListView(View):
@@ -47,6 +49,26 @@ class PostDetailView(View):
             'comments': comments,
             'form': form,
         })
+
+
+class PostCreateView(LoginRequiredMixin, View):
+    template_name = 'posts/post_create.html'
+    login_url = '/accounts/login/'
+
+    def get(self, request):
+        form = PostForm()
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request):
+        form = PostForm(request.POST, request.FILES)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.created_at = timezone.now()
+            post.updated_at = timezone.now()
+            post.save()
+            return redirect('post_detail', pk=post.pk)
+        return render(request, self.template_name, {'form': form})
 
 
 class FeedView(View):

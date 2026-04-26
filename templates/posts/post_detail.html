@@ -17,7 +17,7 @@
     </div>
 
     {% if post.image %}
-        <img class="post-detail__image" src="{{ post.image }}" alt="{{ post.title }}">
+        <img class="post-detail__image" src="{{ post.image.url }}" alt="{{ post.title }}">
     {% endif %}
 
     <div class="post-detail__content">{{ post.content|linebreaks }}</div>
