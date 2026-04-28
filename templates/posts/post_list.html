@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Посты — Igrovorot{% endblock %}
+
+{% block content %}
+<div class="post-list">
+    <h1>Посты</h1>
+
+    {% if current_tag %}
+        <p class="post-list__filter">
+            Тег: <strong>{{ current_tag }}</strong>
+            <a href="{% url 'post_list' %}">Сбросить</a>
+        </p>
+    {% endif %}
+
+    {% if page_obj %}
+        <ul class="post-list__items">
+            {% for post in page_obj %}
+                <li class="post-list__item">
+                    <a href="{% url 'post_detail' post.pk %}">
+                        <h2 class="post-list__title">{{ post.title }}</h2>
+                    </a>
+                    <div class="post-list__meta">
+                        <a href="{% url 'profile' post.author.username %}">{{ post.author.username }}</a>
+                        <span>{{ post.created_at|date:"d.m.Y" }}</span>
+                        {% if post.tags %}
+                            <span class="post-list__tags">
+                                {% for tag in post.tags.split %}
+                                    {% with tag_clean=tag|cut:"," %}
+                                        <a href="{% url 'post_list' %}?tag={{ tag_clean }}">{{ tag_clean }}</a>
+                                    {% endwith %}
+                                {% endfor %}
+                            </span>
+                        {% endif %}
+                    </div>
+                    <p class="post-list__excerpt">{{ post.content|truncatewords:30 }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if current_tag %}&tag={{ current_tag }}{% endif %}">Назад</a>
+            {% endif %}
+
+            <span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if current_tag %}&tag={{ current_tag }}{% endif %}">Вперёд</a>
+            {% endif %}
+        </div>
+    {% else %}
+        <p class="post-list__empty">Постов пока нет.</p>
+    {% endif %}
+</div>
+{% endblock %}

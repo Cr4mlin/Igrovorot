@@ -6,7 +6,7 @@ class Post(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     content = models.TextField()
-    image = models.CharField(max_length=512, blank=True, null=True)
+    image = models.ImageField(upload_to='posts_image/', blank=True, null=True)
     tags = models.TextField(blank=True, null=True)
     is_published = models.BooleanField()
     created_at = models.DateTimeField()
