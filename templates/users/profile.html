@@ -32,8 +32,20 @@
                 <p class="profile__banned">Аккаунт заблокирован</p>
             {% endif %}
 
+            <div class="profile__stats">
+                <span class="profile__stat"><strong class="followers-count">{{ followers_count }}</strong> подписчиков</span>
+                <span class="profile__stat"><strong>{{ following_count }}</strong> подписок</span>
+            </div>
+
             {% if request.user == profile_user %}
                 <a href="{% url 'profile_edit' %}">Редактировать профиль</a>
+            {% elif request.user.is_authenticated %}
+                <button class="follow-btn {% if is_following %}follow-btn--active{% endif %}"
+                        data-username="{{ profile_user.username }}">
+                    {% if is_following %}Отписаться{% else %}Подписаться{% endif %}
+                </button>
+            {% else %}
+                <a href="{% url 'login' %}">Войдите</a>, чтобы подписаться
             {% endif %}
         </div>
     </div>
@@ -75,4 +87,10 @@
 
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{% load static %}
+<script src="{% static 'js/csrf.js' %}"></script>
+<script src="{% static 'js/follow.js' %}"></script>
 {% endblock %}
