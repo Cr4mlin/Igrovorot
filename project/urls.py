@@ -25,4 +25,5 @@ urlpatterns = [
     path('', FeedView.as_view(), name='home'),
     path('', include('users.urls')),
     path('', include('posts.urls')),
+    path('', include('social.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
