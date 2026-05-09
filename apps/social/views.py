@@ -12,6 +12,26 @@ from posts.models import Post
 User = get_user_model()
 
 
+class LikeStatusView(View):
+
+    def get(self, request):
+        post_id = request.GET.get('post_id')
+        if not post_id:
+            return JsonResponse({'error': 'Необходимо передать post_id'}, status=400)
+
+        try:
+            post = Post.objects.get(pk=post_id)
+        except Post.DoesNotExist:
+            return JsonResponse({'error': 'Пост не найден'}, status=404)
+
+        liked = (
+            request.user.is_authenticated and
+            Like.objects.filter(user=request.user, post=post, review=None).exists()
+        )
+        count = Like.objects.filter(post=post, review=None).count()
+        return JsonResponse({'liked': liked, 'count': count})
+
+
 @method_decorator(require_POST, name='dispatch')
 class LikeView(View):
 

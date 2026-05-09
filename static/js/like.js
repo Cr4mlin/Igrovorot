@@ -3,11 +3,20 @@ function getCsrfToken() {
     return cookie ? cookie.trim().split('=')[1] : '';
 }
 
+function applyLikeState(btn, liked, count) {
+    btn.classList.toggle('like-btn--active', liked);
+    btn.querySelector('.like-count').textContent = count;
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.like-btn').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-            const postId = btn.dataset.postId;
+        const postId = btn.dataset.postId;
 
+        fetch('/social/like/status/?post_id=' + postId)
+            .then(r => r.json())
+            .then(data => applyLikeState(btn, data.liked, data.count));
+
+        btn.addEventListener('click', function () {
             fetch('/social/like/', {
                 method: 'POST',
                 headers: {
@@ -25,8 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 })
                 .then(function (data) {
                     if (!data) return;
-                    btn.classList.toggle('like-btn--active', data.liked);
-                    btn.querySelector('.like-count').textContent = data.count;
+                    applyLikeState(btn, data.liked, data.count);
                 });
         });
     });
