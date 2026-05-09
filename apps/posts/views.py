@@ -6,6 +6,7 @@ from django.core.paginator import Paginator
 from django.utils import timezone
 from posts.models import Post
 from posts.forms import PostForm, CommentForm
+from social.models import Like, Follow
 
 
 class PostListView(View):
@@ -34,11 +35,18 @@ class PostDetailView(View):
             post.author == request.user or
             request.user.groups.filter(name='Moderator').exists()
         )
+        likes_count = Like.objects.filter(post=post, review=None).count()
+        user_liked = (
+            request.user.is_authenticated and
+            Like.objects.filter(user=request.user, post=post, review=None).exists()
+        )
         return render(request, self.template_name, {
             'post': post,
             'comments': comments,
             'form': form,
             'can_edit': can_edit,
+            'likes_count': likes_count,
+            'user_liked': user_liked,
         })
 
     def post(self, request, pk):
@@ -133,7 +141,17 @@ class FeedView(View):
     paginate_by = 10
 
     def get(self, request):
-        posts = Post.objects.filter(is_published=True).order_by('-created_at')
+        if request.user.is_authenticated:
+            followed_ids = Follow.objects.filter(
+                follower=request.user
+            ).values_list('following_id', flat=True)
+            posts = Post.objects.filter(
+                author_id__in=followed_ids, is_published=True
+            ).order_by('-created_at')
+            if not posts.exists():
+                posts = Post.objects.filter(is_published=True).order_by('-created_at')
+        else:
+            posts = Post.objects.filter(is_published=True).order_by('-created_at')
         paginator = Paginator(posts, self.paginate_by)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)

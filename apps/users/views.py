@@ -11,6 +11,8 @@ from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from users.forms import RegisterForm, ProfileEditForm
 from users.models import User, Profile
+from posts.models import Post
+from social.models import Follow
 
 
 
@@ -87,9 +89,20 @@ class ProfileView(View):
     def get(self, request, username):
         profile_user = get_object_or_404(User, username=username)
         profile, _ = Profile.objects.get_or_create(user=profile_user)
+        posts = Post.objects.filter(author=profile_user, is_published=True).order_by('-created_at')
+        followers_count = Follow.objects.filter(following=profile_user).count()
+        following_count = Follow.objects.filter(follower=profile_user).count()
+        is_following = (
+            request.user.is_authenticated and
+            Follow.objects.filter(follower=request.user, following=profile_user).exists()
+        )
         return render(request, self.template_name, {
             'profile_user': profile_user,
             'profile': profile,
+            'posts': posts,
+            'followers_count': followers_count,
+            'following_count': following_count,
+            'is_following': is_following,
         })
 
 

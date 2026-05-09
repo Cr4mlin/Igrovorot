@@ -33,6 +33,17 @@
 
     <div class="post-detail__content">{{ post.content|linebreaks }}</div>
 
+    <div class="post-detail__actions">
+        {% if request.user.is_authenticated %}
+            <button class="like-btn {% if user_liked %}like-btn--active{% endif %}"
+                    data-post-id="{{ post.pk }}">
+                ❤ <span class="like-count">{{ likes_count }}</span>
+            </button>
+        {% else %}
+            <span>❤ {{ likes_count }}</span>
+        {% endif %}
+    </div>
+
 </div>
 
 <section class="comments">
@@ -68,4 +79,10 @@
     {% endif %}
 
 </section>
+{% endblock %}
+
+{% block scripts %}
+{% load static %}
+<script src="{% static 'js/csrf.js' %}"></script>
+<script src="{% static 'js/like.js' %}"></script>
 {% endblock %}
