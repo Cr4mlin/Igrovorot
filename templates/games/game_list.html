@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}Каталог игр{% endblock %}
+
+{% block content %}
+<h1>Каталог игр</h1>
+
+<form method="get">
+    <input type="text" name="q" value="{{ query }}" placeholder="Поиск по названию...">
+    <button type="submit">Найти</button>
+</form>
+
+<div>
+    <a href="{% url 'games' %}">Все жанры</a>
+    {% for genre in genres %}
+        <a href="{% url 'games' %}?genre={{ genre.slug }}">{{ genre.name }}</a>
+    {% endfor %}
+</div>
+
+<div>
+    {% for game in page_obj %}
+        <div>
+            {% if game.cover %}
+                <img src="{{ game.cover }}" alt="{{ game.title }}" width="200">
+            {% endif %}
+            <h3><a href="{% url 'game_detail' game.slug %}">{{ game.title }}</a></h3>
+            {% if game.developer %}<p>{{ game.developer }}</p>{% endif %}
+            {% if game.release_date %}<p>{{ game.release_date }}</p>{% endif %}
+        </div>
+    {% empty %}
+        <p>Игры не найдены.</p>
+    {% endfor %}
+</div>
+
+{% if page_obj.has_other_pages %}
+<div>
+    {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}{% if query %}&q={{ query }}{% endif %}">← Назад</a>
+    {% endif %}
+    <span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}{% if query %}&q={{ query }}{% endif %}">Вперёд →</a>
+    {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}
