@@ -143,4 +143,7 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'noreply@gamenet.com'
+DEFAULT_FROM_EMAIL = 'noreply@igrovorot.com'
+
+
+RAWG_API_KEY = config('RAWG_API_KEY')

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}{{ game.title }}{% endblock %}
+
+{% block content %}
+<div>
+    {% if game.cover %}
+        <img src="{{ game.cover }}" alt="{{ game.title }}" width="300">
+    {% endif %}
+
+    <h1>{{ game.title }}</h1>
+
+    {% if game.developer %}
+        <p>Разработчик: {{ game.developer }}</p>
+    {% endif %}
+
+    {% if game.release_date %}
+        <p>Дата выхода: {{ game.release_date }}</p>
+    {% endif %}
+
+    <div>
+        {% for gg in genres %}
+            <span>{{ gg.genre.name }}</span>
+        {% endfor %}
+    </div>
+
+    {% if game.description %}
+        <p>{{ game.description }}</p>
+    {% endif %}
+</div>
+{% endblock %}
