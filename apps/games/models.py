@@ -14,8 +14,8 @@ class Game(models.Model):
 
 class GameGenre(models.Model):
     pk = models.CompositePrimaryKey('game_id', 'genre_id')
-    game = models.ForeignKey(Game, models.DO_NOTHING)
-    genre = models.ForeignKey('Genre', models.DO_NOTHING)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    genre = models.ForeignKey('Genre', on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'game_genre'

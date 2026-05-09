@@ -2,8 +2,8 @@ from django.db import models
 from django.conf import settings
 
 class Review(models.Model):
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, models.DO_NOTHING)
-    game = models.ForeignKey('games.Game', models.DO_NOTHING)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    game = models.ForeignKey('games.Game', on_delete=models.CASCADE)
     rating = models.SmallIntegerField()
     content = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField()
