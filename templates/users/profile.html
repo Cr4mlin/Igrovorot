@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ profile_user.username }} — Igrovorot{% endblock %}
+
+{% block content %}
+<div class="profile">
+    <div class="profile__header">
+        {% if profile.avatar %}
+            <img class="profile__avatar" src="{{ profile.avatar.url }}" alt="Аватар {{ profile_user.username }}">
+        {% else %}
+            <div class="profile__avatar profile__avatar--placeholder">{{ profile_user.username|first|upper }}</div>
+        {% endif %}
+
+        <div class="profile__info">
+            <h1 class="profile__username">{{ profile_user.username }}</h1>
+
+            {% if profile.bio %}
+                <p class="profile__bio">{{ profile.bio }}</p>
+            {% endif %}
+
+            <div class="profile__meta">
+                {% if profile.birth_date %}
+                    <span class="profile__meta-item">Дата рождения: {{ profile.birth_date|date:"d.m.Y" }}</span>
+                {% endif %}
+                {% if profile.steam_id %}
+                    <span class="profile__meta-item">Steam ID: {{ profile.steam_id }}</span>
+                {% endif %}
+                <span class="profile__meta-item">На сайте с: {{ profile_user.date_joined|date:"d.m.Y" }}</span>
+            </div>
+
+            {% if profile.is_banned %}
+                <p class="profile__banned">Аккаунт заблокирован</p>
+            {% endif %}
+
+            {% if request.user == profile_user %}
+                <a href="{% url 'profile_edit' %}">Редактировать профиль</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="profile__content">
+
+        <section class="profile__posts">
+            <h2>Посты</h2>
+            {% if posts %}
+                <ul class="profile__list">
+                    {% for post in posts %}
+                        <li class="profile__list-item">
+                            <a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a>
+                            <span class="profile__list-date">{{ post.created_at|date:"d.m.Y" }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="profile__empty">Постов пока нет.</p>
+            {% endif %}
+        </section>
+
+        <section class="profile__reviews">
+            <h2>Рецензии</h2>
+            {% if reviews %}
+                <ul class="profile__list">
+                    {% for review in reviews %}
+                        <li class="profile__list-item">
+                            <a href="{% url 'game_detail' review.game.slug %}">{{ review.game.title }}</a>
+                            <span class="profile__list-rating">{{ review.rating }}/10</span>
+                            <span class="profile__list-date">{{ review.created_at|date:"d.m.Y" }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="profile__empty">Рецензий пока нет.</p>
+            {% endif %}
+        </section>
+
+    </div>
+</div>
+{% endblock %}

@@ -16,5 +16,6 @@ venv/
 
 # IDE
 .idea/
+.idea
 
 */*/migrations/
