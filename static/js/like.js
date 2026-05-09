@@ -1,8 +1,3 @@
-function getCsrfToken() {
-    const cookie = document.cookie.split(';').find(c => c.trim().startsWith('csrftoken='));
-    return cookie ? cookie.trim().split('=')[1] : '';
-}
-
 function applyLikeState(btn, liked, count) {
     btn.classList.toggle('like-btn--active', liked);
     btn.querySelector('.like-count').textContent = count;
