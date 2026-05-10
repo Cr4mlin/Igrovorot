@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
+from django.http import Http404
 from django.views import View
 from django.core.paginator import Paginator
 from django.utils import timezone
@@ -28,19 +29,19 @@ class PostDetailView(View):
     template_name = 'posts/post_detail.html'
 
     def get(self, request, pk):
-        post = get_object_or_404(Post, pk=pk, is_published=True)
+        post = get_object_or_404(Post, pk=pk)
+        is_moderator = request.user.is_authenticated and request.user.groups.filter(name='Moderator').exists()
+        is_author = request.user.is_authenticated and post.author == request.user
+        if not post.is_published and not is_moderator and not is_author:
+            raise Http404
         comments = post.comment_set.select_related('author').order_by('created_at')
         form = CommentForm()
-        can_edit = request.user.is_authenticated and (
-            post.author == request.user or
-            request.user.groups.filter(name='Moderator').exists()
-        )
+        can_edit = is_author or is_moderator
         likes_count = Like.objects.filter(post=post, review=None).count()
         user_liked = (
             request.user.is_authenticated and
             Like.objects.filter(user=request.user, post=post, review=None).exists()
         )
-        is_moderator = request.user.is_authenticated and request.user.groups.filter(name='Moderator').exists()
         return render(request, self.template_name, {
             'post': post,
             'comments': comments,
