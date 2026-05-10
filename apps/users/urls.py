@@ -8,4 +8,5 @@ urlpatterns = [
     path('accounts/verify-email/<uidb64>/<token>/', views.VerifyEmailView.as_view(), name='verify_email'),
     path('profile/edit/', views.ProfileEditView.as_view(), name='profile_edit'),
     path('profile/<str:username>/', views.ProfileView.as_view(), name='profile'),
+    path('banned/', views.BannedView.as_view(), name='banned'),
 ]
