@@ -85,6 +85,19 @@ class LogoutView(View):
         logout(request)
         return redirect('login')
 
+class BannedView(View):
+    def get(self, request):
+        if not request.user.is_authenticated:
+            return redirect('login')
+        try:
+            profile = request.user.profile
+            if not profile.is_banned:
+                return redirect('feed')
+        except Exception:
+            return redirect('login')
+        return render(request, 'users/banned.html', {'profile': profile})
+
+
 class ProfileView(View):
     template_name = 'users/profile.html'
 

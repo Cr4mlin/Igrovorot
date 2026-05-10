@@ -4,7 +4,7 @@ from django.core.exceptions import PermissionDenied
 from django.views import View
 from django.core.paginator import Paginator
 from django.utils import timezone
-from posts.models import Post
+from posts.models import Post, Comment
 from posts.forms import PostForm, CommentForm
 from social.models import Like, Follow
 
@@ -40,6 +40,7 @@ class PostDetailView(View):
             request.user.is_authenticated and
             Like.objects.filter(user=request.user, post=post, review=None).exists()
         )
+        is_moderator = request.user.is_authenticated and request.user.groups.filter(name='Moderator').exists()
         return render(request, self.template_name, {
             'post': post,
             'comments': comments,
@@ -47,6 +48,7 @@ class PostDetailView(View):
             'can_edit': can_edit,
             'likes_count': likes_count,
             'user_liked': user_liked,
+            'is_moderator': is_moderator,
         })
 
     def post(self, request, pk):
@@ -134,6 +136,19 @@ class PostDeleteView(LoginRequiredMixin, View):
         post = self._get_post_or_403(request, pk)
         post.delete()
         return redirect('post_list')
+
+
+class CommentDeleteView(LoginRequiredMixin, View):
+    login_url = '/accounts/login/'
+
+    def post(self, request, pk):
+        comment = get_object_or_404(Comment, pk=pk)
+        is_moderator = request.user.groups.filter(name='Moderator').exists()
+        if comment.author != request.user and not is_moderator:
+            raise PermissionDenied
+        post_pk = comment.post.pk
+        comment.delete()
+        return redirect('post_detail', pk=post_pk)
 
 
 class FeedView(View):

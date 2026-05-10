@@ -40,6 +40,11 @@
             {% if request.user == profile_user %}
                 <a href="{% url 'profile_edit' %}">Редактировать профиль</a>
             {% elif request.user.is_authenticated %}
+                <form method="post" action="{% url 'report_create' 'users' 'user' profile_user.pk %}" style="display:inline">
+                    {% csrf_token %}
+                    <input type="text" name="reason" placeholder="Причина жалобы" required>
+                    <button type="submit">Пожаловаться</button>
+                </form>
                 <button class="follow-btn {% if is_following %}follow-btn--active{% endif %}"
                         data-username="{{ profile_user.username }}">
                     {% if is_following %}Отписаться{% else %}Подписаться{% endif %}

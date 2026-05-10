@@ -28,4 +28,5 @@ urlpatterns = [
     path('', include('social.urls')),
     path('', include('games.urls')),
     path('', include('reviews.urls')),
+    path('', include('moderation.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

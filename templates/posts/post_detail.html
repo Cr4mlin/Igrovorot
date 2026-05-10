@@ -25,6 +25,12 @@
     {% if can_edit %}
         <a href="{% url 'post_edit' post.pk %}">Редактировать</a>
         <a href="{% url 'post_delete' post.pk %}">Удалить</a>
+    {% elif request.user.is_authenticated %}
+        <form method="post" action="{% url 'report_create' 'posts' 'post' post.pk %}" style="display:inline">
+            {% csrf_token %}
+            <input type="text" name="reason" placeholder="Причина жалобы" required>
+            <button type="submit">Пожаловаться</button>
+        </form>
     {% endif %}
 
     {% if post.image %}
@@ -56,6 +62,12 @@
                     <div class="comments__author">
                         <a href="{% url 'profile' comment.author.username %}">{{ comment.author.username }}</a>
                         <span class="comments__date">{{ comment.created_at|date:"d.m.Y" }}</span>
+                        {% if request.user == comment.author or is_moderator %}
+                            <form method="post" action="{% url 'comment_delete' comment.pk %}" style="display:inline">
+                                {% csrf_token %}
+                                <button type="submit">Удалить</button>
+                            </form>
+                        {% endif %}
                     </div>
                     <p class="comments__content">{{ comment.content }}</p>
                 </li>

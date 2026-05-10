@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Заблокировать {{ target.username }} — Igrovorot{% endblock %}
+
+{% block content %}
+<div class="moderation">
+    <h1>Заблокировать пользователя: {{ target.username }}</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                    <small>{{ field.help_text }}</small>
+                {% endif %}
+                {% for error in field.errors %}
+                    <span class="form-error">{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% endfor %}
+        <button type="submit">Заблокировать</button>
+        <a href="{% url 'moderation' %}">Отмена</a>
+    </form>
+</div>
+{% endblock %}
