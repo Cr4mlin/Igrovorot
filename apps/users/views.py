@@ -13,6 +13,7 @@ from users.forms import RegisterForm, ProfileEditForm
 from users.models import User, Profile
 from posts.models import Post
 from social.models import Follow
+from users.steam import resolve_steam_id, get_steam_games
 
 
 
@@ -96,6 +97,11 @@ class ProfileView(View):
             request.user.is_authenticated and
             Follow.objects.filter(follower=request.user, following=profile_user).exists()
         )
+        steam_games = []
+        if profile.steam_id:
+            steam_id = resolve_steam_id(profile.steam_id)
+            if steam_id:
+                steam_games = get_steam_games(steam_id)
         return render(request, self.template_name, {
             'profile_user': profile_user,
             'profile': profile,
@@ -103,6 +109,7 @@ class ProfileView(View):
             'followers_count': followers_count,
             'following_count': following_count,
             'is_following': is_following,
+            'steam_games': steam_games,
         })
 
 

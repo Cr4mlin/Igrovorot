@@ -147,3 +147,4 @@ DEFAULT_FROM_EMAIL = 'noreply@igrovorot.com'
 
 
 RAWG_API_KEY = config('RAWG_API_KEY')
+STEAM_API_KEY = config('STEAM_API_KEY')

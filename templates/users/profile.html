@@ -85,6 +85,37 @@
             {% endif %}
         </section>
 
+        {% if profile.steam_id %}
+        <section class="profile__steam">
+            <h2>Библиотека Steam</h2>
+            {% if steam_games %}
+                <table class="steam-table">
+                    <thead>
+                        <tr>
+                            <th>Игра</th>
+                            <th>Наиграно</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for game in steam_games %}
+                        <tr>
+                            <td>
+                                {% if game.icon_url %}
+                                    <img src="{{ game.icon_url }}" alt="{{ game.name }}" width="32" height="32">
+                                {% endif %}
+                                {{ game.name }}
+                            </td>
+                            <td>{{ game.playtime_hours }} ч.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="profile__empty">Не удалось загрузить библиотеку. Возможно профиль Steam закрытый.</p>
+            {% endif %}
+        </section>
+        {% endif %}
+
     </div>
 </div>
 {% endblock %}
