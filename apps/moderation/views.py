@@ -9,7 +9,7 @@ from users.models import User
 from posts.models import Post
 from reviews.models import Review
 from moderation.models import Report
-from moderation.forms import ReportForm
+from moderation.forms import ReportForm, BanForm
 
 
 class ModerationView(ModeratorRequiredMixin, View):
@@ -70,4 +70,37 @@ class ReportResolveView(ModeratorRequiredMixin, View):
         report = get_object_or_404(Report, pk=pk)
         report.is_resolved = True
         report.save()
+        return redirect('moderation')
+
+
+class BanUserView(ModeratorRequiredMixin, View):
+    template_name = 'moderation/ban_user.html'
+
+    def get(self, request, username):
+        target = get_object_or_404(User, username=username)
+        form = BanForm()
+        return render(request, self.template_name, {'form': form, 'target': target})
+
+    def post(self, request, username):
+        target = get_object_or_404(User, username=username)
+        form = BanForm(request.POST)
+        if form.is_valid():
+            profile = target.profile
+            profile.is_banned = True
+            profile.banned_until = form.cleaned_data['banned_until']
+            profile.ban_reason = form.cleaned_data['reason']
+            profile.save()
+            return redirect('moderation')
+        return render(request, self.template_name, {'form': form, 'target': target})
+
+
+class UnbanUserView(ModeratorRequiredMixin, View):
+
+    def post(self, request, username):
+        target = get_object_or_404(User, username=username)
+        profile = target.profile
+        profile.is_banned = False
+        profile.banned_until = None
+        profile.ban_reason = None
+        profile.save()
         return redirect('moderation')

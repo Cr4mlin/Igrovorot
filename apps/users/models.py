@@ -13,6 +13,7 @@ class Profile(models.Model):
     steam_id = models.CharField(max_length=100, blank=True, null=True)
     is_banned = models.BooleanField(default=False)
     banned_until = models.DateTimeField(blank=True, null=True)
+    ban_reason = models.TextField(blank=True, null=True)
 
     class Meta:
         db_table = 'profile'
