@@ -3,6 +3,7 @@ import time
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from games.models import Game, Genre, GameGenre
+from games.steam import search_steam_app_id
 
 
 class Command(BaseCommand):
@@ -82,12 +83,21 @@ class Command(BaseCommand):
         )
 
         if created:
+            # Привязываем жанры
             for genre_data in item.get('genres', []):
                 try:
                     genre = Genre.objects.get(slug=genre_data['slug'])
                     GameGenre.objects.get_or_create(game=game, genre=genre)
                 except Genre.DoesNotExist:
                     pass
-            self.stdout.write(f'    + {game.title}')
+
+            # Ищем Steam App ID
+            steam_app_id = search_steam_app_id(item['name'])
+            if steam_app_id:
+                game.steam_app_id = steam_app_id
+                game.save()
+                self.stdout.write(f'    + {game.title} (Steam ID: {steam_app_id})')
+            else:
+                self.stdout.write(f'    + {game.title} (Steam ID не найден)')
 
         time.sleep(0.3)

@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.views import View
 from django.core.paginator import Paginator
 from games.models import Game, Genre
+from games.steam import get_steam_game_details
 
 
 class GameListView(View):
@@ -40,7 +41,13 @@ class GameDetailView(View):
         game = get_object_or_404(Game, slug=slug)
         genres = game.gamegenre_set.select_related('genre').all()
 
+        # Подтягиваем данные из Steam если есть app_id
+        steam_data = None
+        if game.steam_app_id:
+            steam_data = get_steam_game_details(game.steam_app_id)
+
         return render(request, self.template_name, {
             'game': game,
             'genres': genres,
+            'steam_data': steam_data,
         })

@@ -7,6 +7,7 @@ class Game(models.Model):
     cover = models.CharField(max_length=512, blank=True, null=True)
     release_date = models.DateField(blank=True, null=True)
     developer = models.CharField(max_length=255, blank=True, null=True)
+    steam_app_id = models.IntegerField(blank=True, null=True)
 
     class Meta:
         db_table = 'game'

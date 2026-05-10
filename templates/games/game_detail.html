@@ -3,18 +3,51 @@
 
 {% block content %}
 <div>
-    {% if game.cover %}
+    {% if steam_data and steam_data.header_image %}
+        <img src="{{ steam_data.header_image }}" alt="{{ game.title }}">
+    {% elif game.cover %}
         <img src="{{ game.cover }}" alt="{{ game.title }}" width="300">
     {% endif %}
 
     <h1>{{ game.title }}</h1>
 
-    {% if game.developer %}
-        <p>Разработчик: {{ game.developer }}</p>
-    {% endif %}
+    {% if steam_data %}
+        <p>{{ steam_data.short_description }}</p>
 
-    {% if game.release_date %}
-        <p>Дата выхода: {{ game.release_date }}</p>
+        {% if steam_data.developers %}
+            <p>Разработчик: {{ steam_data.developers|join:", " }}</p>
+        {% endif %}
+
+        {% if steam_data.publishers %}
+            <p>Издатель: {{ steam_data.publishers|join:", " }}</p>
+        {% endif %}
+
+        {% if steam_data.metacritic_score %}
+            <p>Metacritic: {{ steam_data.metacritic_score }}</p>
+        {% endif %}
+
+        {% if steam_data.recommendations %}
+            <p>Рекомендаций в Steam: {{ steam_data.recommendations }}</p>
+        {% endif %}
+
+        {% if steam_data.screenshots %}
+            <h2>Скриншоты</h2>
+            <div>
+                {% for screenshot in steam_data.screenshots %}
+                    <img src="{{ screenshot }}" alt="Скриншот" width="300">
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <a href="{{ steam_data.steam_url }}" target="_blank">Открыть в Steam</a>
+
+    {% else %}
+        {% if game.developer %}
+            <p>Разработчик: {{ game.developer }}</p>
+        {% endif %}
+        {% if game.description %}
+            <p>{{ game.description }}</p>
+        {% endif %}
     {% endif %}
 
     <div>
@@ -23,8 +56,8 @@
         {% endfor %}
     </div>
 
-    {% if game.description %}
-        <p>{{ game.description }}</p>
+    {% if game.release_date %}
+        <p>Дата выхода: {{ game.release_date }}</p>
     {% endif %}
 </div>
 {% endblock %}
