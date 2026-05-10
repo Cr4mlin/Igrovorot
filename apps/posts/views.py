@@ -145,10 +145,11 @@ class FeedView(View):
             followed_ids = Follow.objects.filter(
                 follower=request.user
             ).values_list('following_id', flat=True)
-            posts = Post.objects.filter(
-                author_id__in=followed_ids, is_published=True
-            ).order_by('-created_at')
-            if not posts.exists():
+            if followed_ids:
+                posts = Post.objects.filter(
+                    author_id__in=followed_ids, is_published=True
+                ).order_by('-created_at')
+            else:
                 posts = Post.objects.filter(is_published=True).order_by('-created_at')
         else:
             posts = Post.objects.filter(is_published=True).order_by('-created_at')
