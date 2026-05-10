@@ -62,6 +62,12 @@
                     <div class="comments__author">
                         <a href="{% url 'profile' comment.author.username %}">{{ comment.author.username }}</a>
                         <span class="comments__date">{{ comment.created_at|date:"d.m.Y" }}</span>
+                        {% if request.user == comment.author or is_moderator %}
+                            <form method="post" action="{% url 'comment_delete' comment.pk %}" style="display:inline">
+                                {% csrf_token %}
+                                <button type="submit">Удалить</button>
+                            </form>
+                        {% endif %}
                     </div>
                     <p class="comments__content">{{ comment.content }}</p>
                 </li>
