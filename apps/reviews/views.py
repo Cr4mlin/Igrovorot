@@ -53,3 +53,24 @@ class ReviewEditView(LoginRequiredMixin, View):
             edited.save()
             return redirect('game_detail', slug=review.game.slug)
         return render(request, self.template_name, {'form': form, 'review': review})
+
+
+class ReviewDeleteView(LoginRequiredMixin, View):
+    login_url = '/accounts/login/'
+
+    def _get_review_or_403(self, request, pk):
+        review = get_object_or_404(Review, pk=pk)
+        is_moderator = request.user.groups.filter(name='Moderator').exists()
+        if review.author != request.user and not is_moderator:
+            raise PermissionDenied
+        return review
+
+    def get(self, request, pk):
+        review = self._get_review_or_403(request, pk)
+        return render(request, 'reviews/review_confirm_delete.html', {'review': review})
+
+    def post(self, request, pk):
+        review = self._get_review_or_403(request, pk)
+        slug = review.game.slug
+        review.delete()
+        return redirect('game_detail', slug=slug)

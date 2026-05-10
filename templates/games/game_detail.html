@@ -75,6 +75,15 @@
                         {% if review.content %}
                             <p class="reviews-list__content">{{ review.content }}</p>
                         {% endif %}
+                        {% if request.user.is_authenticated %}
+                            {% if request.user.groups.all %}
+                                {% for group in request.user.groups.all %}
+                                    {% if group.name == 'Moderator' %}
+                                        <a href="{% url 'review_delete' review.pk %}">Удалить</a>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        {% endif %}
                     </li>
                 {% endfor %}
             </ul>
@@ -90,6 +99,7 @@
                 <p>{{ user_review.content }}</p>
             {% endif %}
             <a href="{% url 'review_edit' user_review.pk %}">Редактировать</a>
+            <a href="{% url 'review_delete' user_review.pk %}">Удалить</a>
         {% elif review_form %}
             <form method="post" action="{% url 'review_create' game.slug %}">
                 {% csrf_token %}
