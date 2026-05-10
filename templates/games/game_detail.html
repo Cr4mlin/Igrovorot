@@ -66,6 +66,18 @@
             <p>Средняя оценка: <strong>{{ avg_rating|floatformat:1 }}/10</strong></p>
         {% endif %}
 
+        <form method="get" class="reviews-filter">
+            <select name="rating" onchange="this.form.submit()">
+                <option value="">Все оценки</option>
+                {% for i in rating_choices %}
+                    <option value="{{ i }}" {% if rating_filter == i|stringformat:"s" %}selected{% endif %}>{{ i }}/10</option>
+                {% endfor %}
+            </select>
+            {% if rating_filter %}
+                <a href="?">Сбросить</a>
+            {% endif %}
+        </form>
+
         {% if reviews %}
             <ul class="reviews-list">
                 {% for review in reviews %}

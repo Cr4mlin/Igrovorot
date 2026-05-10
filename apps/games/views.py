@@ -59,6 +59,10 @@ class GameDetailView(View):
         reviews = Review.objects.filter(game=game).select_related('author').order_by('-created_at')
         avg_rating = reviews.aggregate(avg=Avg('rating'))['avg']
 
+        rating_filter = request.GET.get('rating', '').strip()
+        if rating_filter.isdigit() and 1 <= int(rating_filter) <= 10:
+            reviews = reviews.filter(rating=int(rating_filter))
+
         return render(request, self.template_name, {
             'game': game,
             'genres': genres,
@@ -67,4 +71,6 @@ class GameDetailView(View):
             'user_review': user_review,
             'reviews': reviews,
             'avg_rating': avg_rating,
+            'rating_filter': rating_filter,
+            'rating_choices': range(10, 0, -1),
         })
