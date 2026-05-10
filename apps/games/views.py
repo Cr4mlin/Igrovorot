@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.views import View
 from django.core.paginator import Paginator
+from django.db.models import Avg
 from games.models import Game, Genre
 from games.steam import get_steam_game_details
 from reviews.models import Review
@@ -56,6 +57,7 @@ class GameDetailView(View):
                 review_form = ReviewForm()
 
         reviews = Review.objects.filter(game=game).select_related('author').order_by('-created_at')
+        avg_rating = reviews.aggregate(avg=Avg('rating'))['avg']
 
         return render(request, self.template_name, {
             'game': game,
@@ -64,4 +66,5 @@ class GameDetailView(View):
             'review_form': review_form,
             'user_review': user_review,
             'reviews': reviews,
+            'avg_rating': avg_rating,
         })

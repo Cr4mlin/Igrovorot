@@ -62,6 +62,9 @@
 
     <section class="game-reviews">
         <h2>Рецензии ({{ reviews.count }})</h2>
+        {% if avg_rating %}
+            <p>Средняя оценка: <strong>{{ avg_rating|floatformat:1 }}/10</strong></p>
+        {% endif %}
 
         {% if reviews %}
             <ul class="reviews-list">
