@@ -3,4 +3,5 @@ from reviews import views
 
 urlpatterns = [
     path('games/<slug:slug>/review/', views.ReviewCreateView.as_view(), name='review_create'),
+    path('reviews/<int:pk>/edit/', views.ReviewEditView.as_view(), name='review_edit'),
 ]

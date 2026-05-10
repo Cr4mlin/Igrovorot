@@ -89,6 +89,7 @@
             {% if user_review.content %}
                 <p>{{ user_review.content }}</p>
             {% endif %}
+            <a href="{% url 'review_edit' user_review.pk %}">Редактировать</a>
         {% elif review_form %}
             <form method="post" action="{% url 'review_create' game.slug %}">
                 {% csrf_token %}
