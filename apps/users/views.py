@@ -13,6 +13,7 @@ from users.forms import RegisterForm, ProfileEditForm
 from users.models import User, Profile
 from posts.models import Post
 from social.models import Follow
+from reviews.models import Review
 from users.steam import resolve_steam_id, get_steam_games
 
 
@@ -91,6 +92,7 @@ class ProfileView(View):
         profile_user = get_object_or_404(User, username=username)
         profile, _ = Profile.objects.get_or_create(user=profile_user)
         posts = Post.objects.filter(author=profile_user, is_published=True).order_by('-created_at')
+        reviews = Review.objects.filter(author=profile_user).select_related('game').order_by('-created_at')
         followers_count = Follow.objects.filter(following=profile_user).count()
         following_count = Follow.objects.filter(follower=profile_user).count()
         is_following = (
@@ -106,6 +108,7 @@ class ProfileView(View):
             'profile_user': profile_user,
             'profile': profile,
             'posts': posts,
+            'reviews': reviews,
             'followers_count': followers_count,
             'following_count': following_count,
             'is_following': is_following,

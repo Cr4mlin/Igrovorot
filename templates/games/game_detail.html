@@ -59,5 +59,90 @@
     {% if game.release_date %}
         <p>Дата выхода: {{ game.release_date }}</p>
     {% endif %}
+
+    <section class="game-reviews">
+        <h2>Рецензии ({{ reviews.count }})</h2>
+        {% if avg_rating %}
+            <p>Средняя оценка: <strong>{{ avg_rating|floatformat:1 }}/10</strong></p>
+        {% endif %}
+
+        <form method="get" class="reviews-filter">
+            <select name="rating" onchange="this.form.submit()">
+                <option value="">Все оценки</option>
+                {% for i in rating_choices %}
+                    <option value="{{ i }}" {% if rating_filter == i|stringformat:"s" %}selected{% endif %}>{{ i }}/10</option>
+                {% endfor %}
+            </select>
+            {% if rating_filter %}
+                <a href="?">Сбросить</a>
+            {% endif %}
+        </form>
+
+        {% if reviews %}
+            <ul class="reviews-list">
+                {% for review in reviews %}
+                    <li class="reviews-list__item">
+                        <div class="reviews-list__meta">
+                            <a href="{% url 'profile' review.author.username %}">{{ review.author.username }}</a>
+                            <strong>{{ review.rating }}/10</strong>
+                            <span>{{ review.created_at|date:"d.m.Y" }}</span>
+                        </div>
+                        {% if review.content %}
+                            <p class="reviews-list__content">{{ review.content }}</p>
+                        {% endif %}
+                        {% if request.user.is_authenticated %}
+                            <button class="like-btn" data-review-id="{{ review.pk }}">
+                                ❤ <span class="like-count"></span>
+                            </button>
+                            {% if request.user.groups.all %}
+                                {% for group in request.user.groups.all %}
+                                    {% if group.name == 'Moderator' %}
+                                        <a href="{% url 'review_delete' review.pk %}">Удалить</a>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        {% else %}
+                            <span>❤ <span class="like-count" data-review-id="{{ review.pk }}"></span></span>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Рецензий пока нет.</p>
+        {% endif %}
+
+        <h3>{% if user_review %}Ваша рецензия{% elif review_form %}Написать рецензию{% endif %}</h3>
+
+        {% if user_review %}
+            <p>Ваша оценка: <strong>{{ user_review.rating }}/10</strong></p>
+            {% if user_review.content %}
+                <p>{{ user_review.content }}</p>
+            {% endif %}
+            <a href="{% url 'review_edit' user_review.pk %}">Редактировать</a>
+            <a href="{% url 'review_delete' user_review.pk %}">Удалить</a>
+        {% elif review_form %}
+            <form method="post" action="{% url 'review_create' game.slug %}">
+                {% csrf_token %}
+                {% for field in review_form %}
+                    <div class="form-group">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% for error in field.errors %}
+                            <span class="form-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+                <button type="submit">Опубликовать рецензию</button>
+            </form>
+        {% else %}
+            <p><a href="{% url 'login' %}">Войдите</a>, чтобы оставить рецензию.</p>
+        {% endif %}
+    </section>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{% load static %}
+<script src="{% static 'js/csrf.js' %}"></script>
+<script src="{% static 'js/like.js' %}"></script>
 {% endblock %}
