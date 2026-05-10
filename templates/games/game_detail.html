@@ -91,6 +91,9 @@
                             <p class="reviews-list__content">{{ review.content }}</p>
                         {% endif %}
                         {% if request.user.is_authenticated %}
+                            <button class="like-btn" data-review-id="{{ review.pk }}">
+                                ❤ <span class="like-count"></span>
+                            </button>
                             {% if request.user.groups.all %}
                                 {% for group in request.user.groups.all %}
                                     {% if group.name == 'Moderator' %}
@@ -98,6 +101,8 @@
                                     {% endif %}
                                 {% endfor %}
                             {% endif %}
+                        {% else %}
+                            <span>❤ <span class="like-count" data-review-id="{{ review.pk }}"></span></span>
                         {% endif %}
                     </li>
                 {% endfor %}
@@ -134,4 +139,10 @@
         {% endif %}
     </section>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{% load static %}
+<script src="{% static 'js/csrf.js' %}"></script>
+<script src="{% static 'js/like.js' %}"></script>
 {% endblock %}
