@@ -7,7 +7,7 @@
     <h1>Панель модератора</h1>
 
     <section class="moderation__section">
-        <h2>Посты ({{ posts.count }})</h2>
+        <h2>Посты ({{ posts|length }})</h2>
         {% if posts %}
             <table class="moderation__table">
                 <thead>
@@ -16,6 +16,7 @@
                         <th>Автор</th>
                         <th>Дата</th>
                         <th>Опубликован</th>
+                        <th>Жалобы</th>
                         <th>Действия</th>
                     </tr>
                 </thead>
@@ -27,10 +28,43 @@
                             <td>{{ post.created_at|date:"d.m.Y" }}</td>
                             <td>{% if post.is_published %}Да{% else %}Нет{% endif %}</td>
                             <td>
+                                {% if post.open_reports %}
+                                    <button onclick="toggleReports('post-reports-{{ post.pk }}')">
+                                        Жалоб: {{ post.open_reports|length }}
+                                    </button>
+                                {% endif %}
+                            </td>
+                            <td>
                                 <a href="{% url 'post_edit' post.pk %}">Редактировать</a>
                                 <a href="{% url 'post_delete' post.pk %}">Удалить</a>
                             </td>
                         </tr>
+                        {% if post.open_reports %}
+                            <tr id="post-reports-{{ post.pk }}" style="display:none">
+                                <td colspan="6">
+                                    <table class="moderation__reports">
+                                        <thead>
+                                            <tr><th>От кого</th><th>Причина</th><th>Дата</th><th></th></tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for report in post.open_reports %}
+                                                <tr>
+                                                    <td><a href="{% url 'profile' report.user.username %}">{{ report.user.username }}</a></td>
+                                                    <td>{{ report.reason }}</td>
+                                                    <td>{{ report.created_at|date:"d.m.Y" }}</td>
+                                                    <td>
+                                                        <form method="post" action="{% url 'report_resolve' report.pk %}">
+                                                            {% csrf_token %}
+                                                            <button type="submit">Закрыть</button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        {% endif %}
                     {% endfor %}
                 </tbody>
             </table>
@@ -40,7 +74,7 @@
     </section>
 
     <section class="moderation__section">
-        <h2>Рецензии ({{ reviews.count }})</h2>
+        <h2>Рецензии ({{ reviews|length }})</h2>
         {% if reviews %}
             <table class="moderation__table">
                 <thead>
@@ -49,6 +83,7 @@
                         <th>Автор</th>
                         <th>Оценка</th>
                         <th>Дата</th>
+                        <th>Жалобы</th>
                         <th>Действия</th>
                     </tr>
                 </thead>
@@ -60,9 +95,43 @@
                             <td>{{ review.rating }}/10</td>
                             <td>{{ review.created_at|date:"d.m.Y" }}</td>
                             <td>
+                                {% if review.open_reports %}
+                                    <button onclick="toggleReports('review-reports-{{ review.pk }}')">
+                                        Жалоб: {{ review.open_reports|length }}
+                                    </button>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'review_edit' review.pk %}">Редактировать</a>
                                 <a href="{% url 'review_delete' review.pk %}">Удалить</a>
                             </td>
                         </tr>
+                        {% if review.open_reports %}
+                            <tr id="review-reports-{{ review.pk }}" style="display:none">
+                                <td colspan="6">
+                                    <table class="moderation__reports">
+                                        <thead>
+                                            <tr><th>От кого</th><th>Причина</th><th>Дата</th><th></th></tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for report in review.open_reports %}
+                                                <tr>
+                                                    <td><a href="{% url 'profile' report.user.username %}">{{ report.user.username }}</a></td>
+                                                    <td>{{ report.reason }}</td>
+                                                    <td>{{ report.created_at|date:"d.m.Y" }}</td>
+                                                    <td>
+                                                        <form method="post" action="{% url 'report_resolve' report.pk %}">
+                                                            {% csrf_token %}
+                                                            <button type="submit">Закрыть</button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        {% endif %}
                     {% endfor %}
                 </tbody>
             </table>
@@ -72,7 +141,7 @@
     </section>
 
     <section class="moderation__section">
-        <h2>Пользователи ({{ users.count }})</h2>
+        <h2>Пользователи ({{ users|length }})</h2>
         {% if users %}
             <table class="moderation__table">
                 <thead>
@@ -81,6 +150,7 @@
                         <th>Email</th>
                         <th>Дата регистрации</th>
                         <th>Статус</th>
+                        <th>Жалобы</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -90,7 +160,40 @@
                             <td>{{ u.email }}</td>
                             <td>{{ u.date_joined|date:"d.m.Y" }}</td>
                             <td>{% if u.is_active %}Активен{% else %}Заблокирован{% endif %}</td>
+                            <td>
+                                {% if u.open_reports %}
+                                    <button onclick="toggleReports('user-reports-{{ u.pk }}')">
+                                        Жалоб: {{ u.open_reports|length }}
+                                    </button>
+                                {% endif %}
+                            </td>
                         </tr>
+                        {% if u.open_reports %}
+                            <tr id="user-reports-{{ u.pk }}" style="display:none">
+                                <td colspan="5">
+                                    <table class="moderation__reports">
+                                        <thead>
+                                            <tr><th>От кого</th><th>Причина</th><th>Дата</th><th></th></tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for report in u.open_reports %}
+                                                <tr>
+                                                    <td><a href="{% url 'profile' report.user.username %}">{{ report.user.username }}</a></td>
+                                                    <td>{{ report.reason }}</td>
+                                                    <td>{{ report.created_at|date:"d.m.Y" }}</td>
+                                                    <td>
+                                                        <form method="post" action="{% url 'report_resolve' report.pk %}">
+                                                            {% csrf_token %}
+                                                            <button type="submit">Закрыть</button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        {% endif %}
                     {% endfor %}
                 </tbody>
             </table>
@@ -99,4 +202,13 @@
         {% endif %}
     </section>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function toggleReports(id) {
+    const row = document.getElementById(id);
+    row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
+}
+</script>
 {% endblock %}

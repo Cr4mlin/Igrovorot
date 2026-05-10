@@ -94,6 +94,13 @@
                             <button class="like-btn" data-review-id="{{ review.pk }}">
                                 ❤ <span class="like-count"></span>
                             </button>
+                            {% if review.author != request.user %}
+                                <form method="post" action="{% url 'report_create' 'reviews' 'review' review.pk %}" style="display:inline">
+                                    {% csrf_token %}
+                                    <input type="text" name="reason" placeholder="Причина жалобы" required>
+                                    <button type="submit">Пожаловаться</button>
+                                </form>
+                            {% endif %}
                             {% if request.user.groups.all %}
                                 {% for group in request.user.groups.all %}
                                     {% if group.name == 'Moderator' %}

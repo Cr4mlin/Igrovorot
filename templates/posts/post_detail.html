@@ -25,6 +25,12 @@
     {% if can_edit %}
         <a href="{% url 'post_edit' post.pk %}">Редактировать</a>
         <a href="{% url 'post_delete' post.pk %}">Удалить</a>
+    {% elif request.user.is_authenticated %}
+        <form method="post" action="{% url 'report_create' 'posts' 'post' post.pk %}" style="display:inline">
+            {% csrf_token %}
+            <input type="text" name="reason" placeholder="Причина жалобы" required>
+            <button type="submit">Пожаловаться</button>
+        </form>
     {% endif %}
 
     {% if post.image %}
