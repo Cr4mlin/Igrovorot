@@ -7,7 +7,25 @@
     <h1>Панель модератора</h1>
 
     <section class="moderation__section">
-        <h2>Посты ({{ posts|length }})</h2>
+        <h2>Посты ({{ posts.paginator.count }})</h2>
+        <form method="get" class="moderation__filters">
+            <input type="hidden" name="reviews_page" value="{{ reviews.number }}">
+            <input type="hidden" name="users_page" value="{{ users.number }}">
+            <input type="hidden" name="q_reviews" value="{{ q_reviews }}">
+            <input type="hidden" name="sort_reviews" value="{{ sort_reviews }}">
+            <input type="hidden" name="q_users" value="{{ q_users }}">
+            <input type="hidden" name="status" value="{{ status }}">
+            <input type="hidden" name="sort_users" value="{{ sort_users }}">
+            <input type="text" name="q_posts" value="{{ q_posts }}" placeholder="Поиск по заголовку">
+            <select name="published">
+                <option value="">Все</option>
+                <option value="yes" {% if published == 'yes' %}selected{% endif %}>Опубликованные</option>
+                <option value="no" {% if published == 'no' %}selected{% endif %}>Неопубликованные</option>
+            </select>
+            <label><input type="checkbox" name="sort_posts" value="reports" {% if sort_posts == 'reports' %}checked{% endif %}> По жалобам ↓</label>
+            <button type="submit">Применить</button>
+            {% if q_posts or published or sort_posts %}<a href="?">Сбросить</a>{% endif %}
+        </form>
         {% if posts %}
             <table class="moderation__table">
                 <thead>
@@ -68,13 +86,38 @@
                     {% endfor %}
                 </tbody>
             </table>
+            {% if posts.has_other_pages %}
+                <div class="pagination">
+                    {% if posts.has_previous %}
+                        <a href="?{{ base_query }}posts_page={{ posts.previous_page_number }}">«</a>
+                    {% endif %}
+                    <span>{{ posts.number }} / {{ posts.paginator.num_pages }}</span>
+                    {% if posts.has_next %}
+                        <a href="?{{ base_query }}posts_page={{ posts.next_page_number }}">»</a>
+                    {% endif %}
+                </div>
+            {% endif %}
         {% else %}
             <p>Постов нет.</p>
         {% endif %}
     </section>
 
     <section class="moderation__section">
-        <h2>Рецензии ({{ reviews|length }})</h2>
+        <h2>Рецензии ({{ reviews.paginator.count }})</h2>
+        <form method="get" class="moderation__filters">
+            <input type="hidden" name="posts_page" value="{{ posts.number }}">
+            <input type="hidden" name="users_page" value="{{ users.number }}">
+            <input type="hidden" name="q_posts" value="{{ q_posts }}">
+            <input type="hidden" name="published" value="{{ published }}">
+            <input type="hidden" name="sort_posts" value="{{ sort_posts }}">
+            <input type="hidden" name="q_users" value="{{ q_users }}">
+            <input type="hidden" name="status" value="{{ status }}">
+            <input type="hidden" name="sort_users" value="{{ sort_users }}">
+            <input type="text" name="q_reviews" value="{{ q_reviews }}" placeholder="Поиск по игре или автору">
+            <label><input type="checkbox" name="sort_reviews" value="reports" {% if sort_reviews == 'reports' %}checked{% endif %}> По жалобам ↓</label>
+            <button type="submit">Применить</button>
+            {% if q_reviews or sort_reviews %}<a href="?">Сбросить</a>{% endif %}
+        </form>
         {% if reviews %}
             <table class="moderation__table">
                 <thead>
@@ -135,13 +178,42 @@
                     {% endfor %}
                 </tbody>
             </table>
+            {% if reviews.has_other_pages %}
+                <div class="pagination">
+                    {% if reviews.has_previous %}
+                        <a href="?{{ base_query }}reviews_page={{ reviews.previous_page_number }}">«</a>
+                    {% endif %}
+                    <span>{{ reviews.number }} / {{ reviews.paginator.num_pages }}</span>
+                    {% if reviews.has_next %}
+                        <a href="?{{ base_query }}reviews_page={{ reviews.next_page_number }}">»</a>
+                    {% endif %}
+                </div>
+            {% endif %}
         {% else %}
             <p>Рецензий нет.</p>
         {% endif %}
     </section>
 
     <section class="moderation__section">
-        <h2>Пользователи ({{ users|length }})</h2>
+        <h2>Пользователи ({{ users.paginator.count }})</h2>
+        <form method="get" class="moderation__filters">
+            <input type="hidden" name="posts_page" value="{{ posts.number }}">
+            <input type="hidden" name="reviews_page" value="{{ reviews.number }}">
+            <input type="hidden" name="q_posts" value="{{ q_posts }}">
+            <input type="hidden" name="published" value="{{ published }}">
+            <input type="hidden" name="sort_posts" value="{{ sort_posts }}">
+            <input type="hidden" name="q_reviews" value="{{ q_reviews }}">
+            <input type="hidden" name="sort_reviews" value="{{ sort_reviews }}">
+            <input type="text" name="q_users" value="{{ q_users }}" placeholder="Поиск по имени или email">
+            <select name="status">
+                <option value="">Все</option>
+                <option value="active" {% if status == 'active' %}selected{% endif %}>Активные</option>
+                <option value="banned" {% if status == 'banned' %}selected{% endif %}>Заблокированные</option>
+            </select>
+            <label><input type="checkbox" name="sort_users" value="reports" {% if sort_users == 'reports' %}checked{% endif %}> По жалобам ↓</label>
+            <button type="submit">Применить</button>
+            {% if q_users or status or sort_users %}<a href="?">Сбросить</a>{% endif %}
+        </form>
         {% if users %}
             <table class="moderation__table">
                 <thead>
@@ -219,6 +291,17 @@
                     {% endfor %}
                 </tbody>
             </table>
+            {% if users.has_other_pages %}
+                <div class="pagination">
+                    {% if users.has_previous %}
+                        <a href="?{{ base_query }}users_page={{ users.previous_page_number }}">«</a>
+                    {% endif %}
+                    <span>{{ users.number }} / {{ users.paginator.num_pages }}</span>
+                    {% if users.has_next %}
+                        <a href="?{{ base_query }}users_page={{ users.next_page_number }}">»</a>
+                    {% endif %}
+                </div>
+            {% endif %}
         {% else %}
             <p>Пользователей нет.</p>
         {% endif %}
