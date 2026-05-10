@@ -3,6 +3,8 @@ from django.views import View
 from django.core.paginator import Paginator
 from games.models import Game, Genre
 from games.steam import get_steam_game_details
+from reviews.models import Review
+from reviews.forms import ReviewForm
 
 
 class GameListView(View):
@@ -46,8 +48,20 @@ class GameDetailView(View):
         if game.steam_app_id:
             steam_data = get_steam_game_details(game.steam_app_id)
 
+        user_review = None
+        review_form = None
+        if request.user.is_authenticated:
+            user_review = Review.objects.filter(author=request.user, game=game).first()
+            if not user_review:
+                review_form = ReviewForm()
+
+        reviews = Review.objects.filter(game=game).select_related('author').order_by('-created_at')
+
         return render(request, self.template_name, {
             'game': game,
             'genres': genres,
             'steam_data': steam_data,
+            'review_form': review_form,
+            'user_review': user_review,
+            'reviews': reviews,
         })

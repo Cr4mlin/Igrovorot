@@ -59,5 +59,53 @@
     {% if game.release_date %}
         <p>Дата выхода: {{ game.release_date }}</p>
     {% endif %}
+
+    <section class="game-reviews">
+        <h2>Рецензии ({{ reviews.count }})</h2>
+
+        {% if reviews %}
+            <ul class="reviews-list">
+                {% for review in reviews %}
+                    <li class="reviews-list__item">
+                        <div class="reviews-list__meta">
+                            <a href="{% url 'profile' review.author.username %}">{{ review.author.username }}</a>
+                            <strong>{{ review.rating }}/10</strong>
+                            <span>{{ review.created_at|date:"d.m.Y" }}</span>
+                        </div>
+                        {% if review.content %}
+                            <p class="reviews-list__content">{{ review.content }}</p>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Рецензий пока нет.</p>
+        {% endif %}
+
+        <h3>{% if user_review %}Ваша рецензия{% elif review_form %}Написать рецензию{% endif %}</h3>
+
+        {% if user_review %}
+            <p>Ваша оценка: <strong>{{ user_review.rating }}/10</strong></p>
+            {% if user_review.content %}
+                <p>{{ user_review.content }}</p>
+            {% endif %}
+        {% elif review_form %}
+            <form method="post" action="{% url 'review_create' game.slug %}">
+                {% csrf_token %}
+                {% for field in review_form %}
+                    <div class="form-group">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% for error in field.errors %}
+                            <span class="form-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+                <button type="submit">Опубликовать рецензию</button>
+            </form>
+        {% else %}
+            <p><a href="{% url 'login' %}">Войдите</a>, чтобы оставить рецензию.</p>
+        {% endif %}
+    </section>
 </div>
 {% endblock %}
