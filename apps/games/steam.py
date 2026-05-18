@@ -53,6 +53,7 @@ def get_steam_game_details(app_id):
             'header_image': details.get('header_image', ''),
             'developers': details.get('developers', []),
             'publishers': details.get('publishers', []),
+            'genres': [g['description'] for g in details.get('genres', [])],
         }
     except Exception:
         return None

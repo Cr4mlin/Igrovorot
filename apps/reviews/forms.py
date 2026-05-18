@@ -11,8 +11,8 @@ class ReviewForm(forms.ModelForm):
             'content': 'Текст рецензии',
         }
         widgets = {
-            'rating': forms.NumberInput(attrs={'min': 1, 'max': 10}),
-            'content': forms.Textarea(attrs={'rows': 5, 'placeholder': 'Напишите рецензию...'}),
+            'rating': forms.NumberInput(attrs={'min': 1, 'max': 10, 'required': True}),
+            'content': forms.Textarea(attrs={'rows': 5, 'placeholder': 'Напишите рецензию...', 'maxlength': '5000'}),
         }
 
     def clean_rating(self):

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load cache %}
 {% block title %}Каталог игр{% endblock %}
 
 {% block content %}
@@ -16,6 +17,7 @@
     {% endfor %}
 </div>
 
+{% cache 900 game_list selected_genre query page_obj.number %}
 <div>
     {% for game in page_obj %}
         <div>
@@ -30,15 +32,38 @@
         <p>Игры не найдены.</p>
     {% endfor %}
 </div>
+{% endcache %}
 
 {% if page_obj.has_other_pages %}
-<div>
+<div class="pagination">
     {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}{% if query %}&q={{ query }}{% endif %}">← Назад</a>
+        <a href="?page={{ page_obj.previous_page_number }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}{% if query %}&q={{ query }}{% endif %}">←</a>
     {% endif %}
-    <span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+
+    {% for p in first_pages %}
+        {% if p == page_obj.number %}
+            <strong>{{ p }}</strong>
+        {% else %}
+            <a href="?page={{ p }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}{% if query %}&q={{ query }}{% endif %}">{{ p }}</a>
+        {% endif %}
+    {% endfor %}
+
+    {% if show_dots %}
+        <span>...</span>
+        <span>{{ page_obj.number }}</span>
+        <span>...</span>
+    {% endif %}
+
+    {% for p in last_pages %}
+        {% if p == page_obj.number %}
+            <strong>{{ p }}</strong>
+        {% else %}
+            <a href="?page={{ p }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}{% if query %}&q={{ query }}{% endif %}">{{ p }}</a>
+        {% endif %}
+    {% endfor %}
+
     {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}{% if query %}&q={{ query }}{% endif %}">Вперёд →</a>
+        <a href="?page={{ page_obj.next_page_number }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}{% if query %}&q={{ query }}{% endif %}">→</a>
     {% endif %}
 </div>
 {% endif %}

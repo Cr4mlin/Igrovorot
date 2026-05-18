@@ -5,6 +5,7 @@ from django.http import Http404
 from django.views import View
 from django.core.paginator import Paginator
 from django.utils import timezone
+from django.db.models import Q
 from posts.models import Post, Comment
 from posts.forms import PostForm, CommentForm
 from social.models import Like, Follow
@@ -16,7 +17,12 @@ class PostListView(View):
 
     def get(self, request):
         tag = request.GET.get('tag', '').strip()
-        posts = Post.objects.filter(is_published=True).order_by('-created_at')
+        if request.user.is_authenticated:
+            posts = Post.objects.filter(
+                Q(is_published=True) | Q(author=request.user)
+            ).distinct().order_by('-created_at')
+        else:
+            posts = Post.objects.filter(is_published=True).order_by('-created_at')
         if tag:
             posts = posts.filter(tags__icontains=tag)
         paginator = Paginator(posts, self.paginate_by)
@@ -53,7 +59,11 @@ class PostDetailView(View):
         })
 
     def post(self, request, pk):
-        post = get_object_or_404(Post, pk=pk, is_published=True)
+        post = get_object_or_404(Post, pk=pk)
+        is_moderator = request.user.is_authenticated and request.user.groups.filter(name='Moderator').exists()
+        is_author = request.user.is_authenticated and post.author == request.user
+        if not post.is_published and not is_moderator and not is_author:
+            raise Http404
         if not request.user.is_authenticated:
             return redirect('login')
         form = CommentForm(request.POST)
@@ -173,3 +183,32 @@ class FeedView(View):
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
         return render(request, self.template_name, {'page_obj': page_obj})
+
+
+class SearchView(View):
+    template_name = 'posts/search.html'
+
+    def get(self, request):
+        from games.models import Game
+        from users.models import User
+        q = request.GET.get('q', '').strip()
+        from urllib.parse import quote, unquote
+        last_query = unquote(request.COOKIES.get('last_search', ''))
+        games, posts, users = [], [], []
+        search_term = q or last_query
+        if search_term:
+            games = Game.objects.filter(title__icontains=search_term).order_by('title')[:10]
+            posts = Post.objects.filter(
+                Q(title__icontains=search_term) | Q(content__icontains=search_term), is_published=True
+            ).select_related('author').order_by('-created_at')[:10]
+            users = User.objects.filter(username__icontains=search_term).order_by('username')[:10]
+        response = render(request, self.template_name, {
+            'q': search_term,
+            'games': games,
+            'posts': posts,
+            'users': users,
+            'from_cookie': bool(last_query and not q),
+        })
+        if q:
+            response.set_cookie('last_search', quote(q), max_age=30 * 24 * 60 * 60)
+        return response

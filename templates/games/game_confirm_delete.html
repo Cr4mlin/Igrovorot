@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Удалить {{ game.title }} — Igrovorot{% endblock %}
+
+{% block content %}
+<div>
+    <h1>Удалить игру «{{ game.title }}»?</h1>
+    <p>Это действие также удалит все рецензии на эту игру.</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Удалить</button>
+        <a href="{% url 'game_detail' game.slug %}">Отмена</a>
+    </form>
+</div>
+{% endblock %}

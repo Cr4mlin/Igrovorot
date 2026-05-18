@@ -22,3 +22,13 @@ class BanMiddleware:
                 pass
 
         return self.get_response(request)
+
+
+class LastSearchMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        from urllib.parse import unquote
+        request.last_search = unquote(request.COOKIES.get('last_search', ''))
+        return self.get_response(request)

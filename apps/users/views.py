@@ -104,7 +104,10 @@ class ProfileView(View):
     def get(self, request, username):
         profile_user = get_object_or_404(User, username=username)
         profile, _ = Profile.objects.get_or_create(user=profile_user)
-        posts = Post.objects.filter(author=profile_user, is_published=True).order_by('-created_at')
+        if request.user == profile_user:
+            posts = Post.objects.filter(author=profile_user).order_by('-created_at')
+        else:
+            posts = Post.objects.filter(author=profile_user, is_published=True).order_by('-created_at')
         reviews = Review.objects.filter(author=profile_user).select_related('game').order_by('-created_at')
         followers_count = Follow.objects.filter(following=profile_user).count()
         following_count = Follow.objects.filter(follower=profile_user).count()
