@@ -29,5 +29,6 @@ class LastSearchMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        request.last_search = request.COOKIES.get('last_search', '')
+        from urllib.parse import unquote
+        request.last_search = unquote(request.COOKIES.get('last_search', ''))
         return self.get_response(request)

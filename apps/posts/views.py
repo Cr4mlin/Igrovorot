@@ -17,7 +17,12 @@ class PostListView(View):
 
     def get(self, request):
         tag = request.GET.get('tag', '').strip()
-        posts = Post.objects.filter(is_published=True).order_by('-created_at')
+        if request.user.is_authenticated:
+            posts = Post.objects.filter(
+                Q(is_published=True) | Q(author=request.user)
+            ).distinct().order_by('-created_at')
+        else:
+            posts = Post.objects.filter(is_published=True).order_by('-created_at')
         if tag:
             posts = posts.filter(tags__icontains=tag)
         paginator = Paginator(posts, self.paginate_by)
@@ -54,7 +59,11 @@ class PostDetailView(View):
         })
 
     def post(self, request, pk):
-        post = get_object_or_404(Post, pk=pk, is_published=True)
+        post = get_object_or_404(Post, pk=pk)
+        is_moderator = request.user.is_authenticated and request.user.groups.filter(name='Moderator').exists()
+        is_author = request.user.is_authenticated and post.author == request.user
+        if not post.is_published and not is_moderator and not is_author:
+            raise Http404
         if not request.user.is_authenticated:
             return redirect('login')
         form = CommentForm(request.POST)
@@ -183,7 +192,8 @@ class SearchView(View):
         from games.models import Game
         from users.models import User
         q = request.GET.get('q', '').strip()
-        last_query = request.COOKIES.get('last_search', '')
+        from urllib.parse import quote, unquote
+        last_query = unquote(request.COOKIES.get('last_search', ''))
         games, posts, users = [], [], []
         search_term = q or last_query
         if search_term:
@@ -200,5 +210,5 @@ class SearchView(View):
             'from_cookie': bool(last_query and not q),
         })
         if q:
-            response.set_cookie('last_search', q, max_age=30 * 24 * 60 * 60)
+            response.set_cookie('last_search', quote(q), max_age=30 * 24 * 60 * 60)
         return response
