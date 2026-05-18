@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load cache %}
 {% block title %}Каталог игр{% endblock %}
 
 {% block content %}
@@ -16,6 +17,7 @@
     {% endfor %}
 </div>
 
+{% cache 900 game_list selected_genre query page_obj.number %}
 <div>
     {% for game in page_obj %}
         <div>
@@ -30,6 +32,7 @@
         <p>Игры не найдены.</p>
     {% endfor %}
 </div>
+{% endcache %}
 
 {% if page_obj.has_other_pages %}
 <div class="pagination">
