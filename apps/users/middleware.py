@@ -22,3 +22,12 @@ class BanMiddleware:
                 pass
 
         return self.get_response(request)
+
+
+class LastSearchMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        request.last_search = request.COOKIES.get('last_search', '')
+        return self.get_response(request)

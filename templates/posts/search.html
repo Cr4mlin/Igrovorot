@@ -3,10 +3,9 @@
 
 {% block content %}
 <div class="search">
-    <form method="get" action="{% url 'search' %}">
-        <input type="text" name="q" value="{{ q }}" placeholder="Поиск игр, постов, профилей..." autofocus>
-        <button type="submit">Найти</button>
-    </form>
+    {% if from_cookie %}
+        <p>Показаны результаты вашего последнего поиска: <strong>{{ q }}</strong></p>
+    {% endif %}
 
     {% if q %}
         <section>

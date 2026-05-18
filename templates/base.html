@@ -10,8 +10,19 @@
 
     <nav>
         <a href="/">Igrovorot</a>
+        <a href="{% url 'games' %}">Каталог игр</a>
+        <a href="{% url 'post_list' %}">Посты</a>
+        <form method="get" action="{% url 'search' %}">
+            <input type="text" name="q" placeholder="Поиск..." value="{{ request.last_search }}">
+            <button type="submit">Найти</button>
+        </form>
         {% if user.is_authenticated %}
             <a href="{% url 'profile' user.username %}">{{ user.username }}</a>
+            {% for group in user.groups.all %}
+                {% if group.name == 'Moderator' %}
+                    <a href="{% url 'moderation' %}">Модерация</a>
+                {% endif %}
+            {% endfor %}
             <a href="{% url 'logout' %}">Выйти</a>
         {% else %}
             <a href="{% url 'login' %}">Войти</a>

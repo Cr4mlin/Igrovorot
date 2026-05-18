@@ -4,18 +4,6 @@
 
 {% block content %}
 <div class="feed">
-    <form method="get" action="{% url 'search' %}">
-        <input type="text" name="q" placeholder="Поиск игр, постов, профилей...">
-        <button type="submit">Найти</button>
-    </form>
-    <a href="{% url 'games' %}">Каталог игр</a>
-    <a href="{% url 'post_list' %}">Все посты</a>
-    {% for group in request.user.groups.all %}
-        {% if group.name == 'Moderator' %}
-            <a href="{% url 'moderation' %}">Панель модератора</a>
-        {% endif %}
-    {% endfor %}
-
     {% if page_obj %}
         {% for post in page_obj %}
             <div class="feed__item">

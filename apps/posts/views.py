@@ -183,16 +183,22 @@ class SearchView(View):
         from games.models import Game
         from users.models import User
         q = request.GET.get('q', '').strip()
+        last_query = request.COOKIES.get('last_search', '')
         games, posts, users = [], [], []
-        if q:
-            games = Game.objects.filter(title__icontains=q).order_by('title')[:10]
+        search_term = q or last_query
+        if search_term:
+            games = Game.objects.filter(title__icontains=search_term).order_by('title')[:10]
             posts = Post.objects.filter(
-                Q(title__icontains=q) | Q(content__icontains=q), is_published=True
+                Q(title__icontains=search_term) | Q(content__icontains=search_term), is_published=True
             ).select_related('author').order_by('-created_at')[:10]
-            users = User.objects.filter(username__icontains=q).order_by('username')[:10]
-        return render(request, self.template_name, {
-            'q': q,
+            users = User.objects.filter(username__icontains=search_term).order_by('username')[:10]
+        response = render(request, self.template_name, {
+            'q': search_term,
             'games': games,
             'posts': posts,
             'users': users,
+            'from_cookie': bool(last_query and not q),
         })
+        if q:
+            response.set_cookie('last_search', q, max_age=30 * 24 * 60 * 60)
+        return response
