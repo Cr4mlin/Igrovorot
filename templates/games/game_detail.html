@@ -10,6 +10,13 @@
     {% endif %}
 
     <h1>{{ game.title }}</h1>
+    {% if request.user.is_authenticated %}
+        {% for group in request.user.groups.all %}
+            {% if group.name == 'Moderator' %}
+                <a href="{% url 'game_delete' game.slug %}">Удалить игру</a>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
 
     {% if steam_data %}
         <p>{{ steam_data.short_description }}</p>

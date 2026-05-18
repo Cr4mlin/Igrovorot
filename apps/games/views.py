@@ -1,4 +1,5 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
+from django.core.exceptions import PermissionDenied
 from django.views import View
 from django.core.paginator import Paginator
 from django.db.models import Avg
@@ -29,12 +30,37 @@ class GameListView(View):
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
 
+        num_pages = paginator.num_pages
+        first_pages = list(range(1, min(4, num_pages + 1)))
+        last_pages = list(range(max(num_pages - 2, 4), num_pages + 1))
+        show_dots = last_pages and last_pages[0] > first_pages[-1] + 1
+
         return render(request, self.template_name, {
             'page_obj': page_obj,
             'genres': genres,
             'selected_genre': genre_slug,
             'query': query or '',
+            'first_pages': first_pages,
+            'last_pages': last_pages,
+            'show_dots': show_dots,
         })
+
+
+class GameDeleteView(View):
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated or not request.user.groups.filter(name='Moderator').exists():
+            raise PermissionDenied
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, slug):
+        game = get_object_or_404(Game, slug=slug)
+        return render(request, 'games/game_confirm_delete.html', {'game': game})
+
+    def post(self, request, slug):
+        game = get_object_or_404(Game, slug=slug)
+        game.delete()
+        return redirect('games')
 
 
 class GameDetailView(View):
