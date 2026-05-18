@@ -5,6 +5,7 @@ from django.http import Http404
 from django.views import View
 from django.core.paginator import Paginator
 from django.utils import timezone
+from django.db.models import Q
 from posts.models import Post, Comment
 from posts.forms import PostForm, CommentForm
 from social.models import Like, Follow
@@ -173,3 +174,25 @@ class FeedView(View):
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
         return render(request, self.template_name, {'page_obj': page_obj})
+
+
+class SearchView(View):
+    template_name = 'posts/search.html'
+
+    def get(self, request):
+        from games.models import Game
+        from users.models import User
+        q = request.GET.get('q', '').strip()
+        games, posts, users = [], [], []
+        if q:
+            games = Game.objects.filter(title__icontains=q).order_by('title')[:10]
+            posts = Post.objects.filter(
+                Q(title__icontains=q) | Q(content__icontains=q), is_published=True
+            ).select_related('author').order_by('-created_at')[:10]
+            users = User.objects.filter(username__icontains=q).order_by('username')[:10]
+        return render(request, self.template_name, {
+            'q': q,
+            'games': games,
+            'posts': posts,
+            'users': users,
+        })
