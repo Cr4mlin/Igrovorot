@@ -18,8 +18,8 @@
             </div>
         {% endfor %}
         <div class="form-actions">
-            <button type="submit">Сохранить</button>
-            <a href="{% url 'game_detail' review.game.slug %}">Отмена</a>
+            <button type="submit" class="btn btn--primary">Сохранить</button>
+            <a href="{% url 'game_detail' review.game.slug %}" class="btn btn--ghost">Отмена</a>
         </div>
     </form>
 </div>

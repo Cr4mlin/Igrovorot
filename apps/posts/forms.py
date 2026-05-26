@@ -5,11 +5,10 @@ from posts.models import Post, Comment
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ('title', 'content', 'image', 'tags', 'is_published')
+        fields = ('title', 'content', 'tags', 'is_published')
         labels = {
             'title': 'Заголовок',
             'content': 'Содержимое',
-            'image': 'Изображение',
             'tags': 'Теги',
             'is_published': 'Опубликовать',
         }
