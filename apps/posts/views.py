@@ -7,7 +7,7 @@ from django.core.paginator import Paginator
 from django.utils import timezone
 from django.db.models import Q, Count
 from datetime import timedelta
-from posts.models import Post, Comment
+from posts.models import Post, Comment, PostImage
 from posts.forms import PostForm, CommentForm
 from social.models import Like, Follow
 
@@ -138,6 +138,8 @@ class PostCreateView(LoginRequiredMixin, View):
             post.created_at = timezone.now()
             post.updated_at = timezone.now()
             post.save()
+            for i, f in enumerate(request.FILES.getlist('images')):
+                PostImage.objects.create(post=post, image=f, order=i)
             return redirect('post_detail', pk=post.pk)
         return render(request, self.template_name, {'form': form})
 
@@ -165,6 +167,9 @@ class PostEditView(LoginRequiredMixin, View):
             edited_post = form.save(commit=False)
             edited_post.updated_at = timezone.now()
             edited_post.save()
+            existing_count = post.images.count()
+            for i, f in enumerate(request.FILES.getlist('images')):
+                PostImage.objects.create(post=post, image=f, order=existing_count + i)
             return redirect('post_detail', pk=post.pk)
         return render(request, self.template_name, {'form': form, 'post': post})
 
@@ -189,6 +194,20 @@ class PostDeleteView(LoginRequiredMixin, View):
         return redirect('post_list')
 
 
+class PostImageDeleteView(LoginRequiredMixin, View):
+    login_url = '/accounts/login/'
+
+    def post(self, request, pk):
+        img = get_object_or_404(PostImage, pk=pk)
+        is_moderator = request.user.groups.filter(name='Moderator').exists()
+        if img.post.author != request.user and not is_moderator:
+            raise PermissionDenied
+        post_pk = img.post.pk
+        img.image.delete(save=False)
+        img.delete()
+        return redirect('post_edit', pk=post_pk)
+
+
 class CommentDeleteView(LoginRequiredMixin, View):
     login_url = '/accounts/login/'
 
@@ -204,24 +223,49 @@ class CommentDeleteView(LoginRequiredMixin, View):
 
 class FeedView(View):
     template_name = 'posts/feed.html'
-    paginate_by = 10
+    paginate_by = 12
 
     def get(self, request):
+        from reviews.models import Review
         if request.user.is_authenticated:
-            followed_ids = Follow.objects.filter(
+            followed_ids = list(Follow.objects.filter(
                 follower=request.user
-            ).values_list('following_id', flat=True)
+            ).values_list('following_id', flat=True))
             if followed_ids:
-                posts = Post.objects.filter(
+                posts = list(Post.objects.filter(
                     author_id__in=followed_ids, is_published=True
-                ).order_by('-created_at')
+                ).select_related('author'))
+                reviews = list(Review.objects.filter(
+                    author_id__in=followed_ids
+                ).select_related('author', 'game'))
             else:
-                posts = Post.objects.filter(is_published=True).order_by('-created_at')
+                posts = list(Post.objects.filter(is_published=True).select_related('author'))
+                reviews = list(Review.objects.all().select_related('author', 'game'))
         else:
-            posts = Post.objects.filter(is_published=True).order_by('-created_at')
-        paginator = Paginator(posts, self.paginate_by)
+            posts = list(Post.objects.filter(is_published=True).select_related('author'))
+            reviews = list(Review.objects.all().select_related('author', 'game'))
+
+        for item in posts:
+            item.item_type = 'post'
+        for item in reviews:
+            item.item_type = 'review'
+
+        feed_items = sorted(posts + reviews, key=lambda x: x.created_at, reverse=True)
+
+        paginator = Paginator(feed_items, self.paginate_by)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
+
+        if request.GET.get('partial'):
+            from django.template.loader import render_to_string
+            from django.http import JsonResponse
+            html = render_to_string('posts/feed_items.html', {'page_obj': page_obj}, request=request)
+            return JsonResponse({
+                'html': html,
+                'has_next': page_obj.has_next(),
+                'next_page': page_obj.next_page_number() if page_obj.has_next() else None,
+            })
+
         from games.models import Game
         from django.contrib.auth import get_user_model
         User = get_user_model()

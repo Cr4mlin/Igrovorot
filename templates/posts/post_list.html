@@ -38,9 +38,13 @@
                                 </span>
                             {% endif %}
                         </div>
-                        {% if post.image %}
-                            <img class="post-list__image" src="{{ post.image.url }}" alt="{{ post.title }}">
-                        {% endif %}
+                        {% with first_img=post.images.first %}
+                            {% if first_img %}
+                                <img class="post-list__image" src="{{ first_img.image.url }}" alt="{{ post.title }}">
+                            {% elif post.image %}
+                                <img class="post-list__image" src="{{ post.image.url }}" alt="{{ post.title }}">
+                            {% endif %}
+                        {% endwith %}
                         <p class="post-list__excerpt">{{ post.content|truncatewords:30 }}</p>
                     </li>
                 {% endfor %}

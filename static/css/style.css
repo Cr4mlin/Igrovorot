@@ -466,6 +466,46 @@ textarea { min-height: 110px; resize: vertical; }
   border-radius: var(--radius-sm); margin-bottom: 12px;
 }
 .feed__empty { color: var(--text-muted); font-size: 14px; padding: 40px 0; text-align: center; }
+.feed__sentinel { height: 1px; }
+.feed__loader {
+  display: flex; justify-content: center; align-items: center;
+  gap: 6px; padding: 24px 0;
+}
+.feed__loader-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--primary); opacity: .3;
+  animation: feed-pulse 1.2s ease-in-out infinite;
+}
+.feed__loader-dot:nth-child(2) { animation-delay: .2s; }
+.feed__loader-dot:nth-child(3) { animation-delay: .4s; }
+@keyframes feed-pulse {
+  0%, 80%, 100% { opacity: .3; transform: scale(.8); }
+  40%            { opacity: 1;  transform: scale(1); }
+}
+.feed__item--review { border-left: 3px solid var(--secondary); }
+.feed__badge {
+  display: inline-flex; align-items: center;
+  background: rgba(16,185,129,.15); color: var(--secondary);
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+  padding: 2px 7px; border-radius: 4px;
+}
+.feed__review-game {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--sidebar-bg); border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm); padding: 10px 12px;
+  margin-bottom: 10px; transition: border-color .2s;
+}
+.feed__review-game:hover { border-color: var(--secondary); }
+.feed__review-cover {
+  width: 56px; height: 56px; object-fit: cover;
+  border-radius: 6px; flex-shrink: 0;
+}
+.feed__review-info { display: flex; flex-direction: column; gap: 4px; }
+.feed__review-title { font-size: 14px; font-weight: 600; color: var(--text); }
+.feed__review-rating {
+  font-size: 13px; font-weight: 700; color: var(--secondary);
+  font-family: var(--mono);
+}
 
 /* ── POST LIST ──────────────────────────────────────────── */
 .post-list h1 { font-size: 26px; font-weight: 700; margin-bottom: 20px; }
@@ -811,6 +851,33 @@ textarea { min-height: 110px; resize: vertical; }
 .post-delete, .review-delete, .profile-edit, .post-create {
   max-width: 600px;
 }
+.post-images-preview {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;
+}
+.post-images-preview__img {
+  width: 100px; height: 100px; object-fit: cover;
+  border-radius: var(--radius-sm); border: 2px solid var(--card-border);
+}
+.post-images-existing {
+  display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px;
+}
+.post-images-existing__item {
+  position: relative; width: 100px; height: 100px;
+}
+.post-images-existing__item img {
+  width: 100%; height: 100%; object-fit: cover;
+  border-radius: var(--radius-sm); border: 2px solid var(--card-border);
+}
+.post-images-existing__delete {
+  position: absolute; top: 4px; right: 4px;
+}
+.post-images-existing__delete .btn {
+  width: 22px; height: 22px; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; line-height: 1;
+  border-radius: 50%;
+}
+
 .post-delete h1, .review-delete h1, .profile-edit h1, .post-create h1 {
   font-size: 22px; font-weight: 700; margin-bottom: 8px;
 }
