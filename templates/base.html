@@ -13,7 +13,7 @@
         <a href="{% url 'games' %}">Каталог игр</a>
         <a href="{% url 'post_list' %}">Посты</a>
         <form method="get" action="{% url 'search' %}">
-            <input type="text" name="q" placeholder="Поиск..." value="{{ request.last_search }}">
+            <input type="text" name="q" placeholder="Поиск..." value="{{ request.GET.q|default:request.last_search }}">
             <button type="submit">Найти</button>
         </form>
         {% if user.is_authenticated %}

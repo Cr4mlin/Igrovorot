@@ -13,11 +13,19 @@
 <div>
     <a href="{% url 'games' %}">Все жанры</a>
     {% for genre in genres %}
-        <a href="{% url 'games' %}?genre={{ genre.slug }}">{{ genre.name }}</a>
+        <a href="{% url 'games' %}?genre={{ genre.slug }}{% if sort %}&sort={{ sort }}{% endif %}">{{ genre.name }}</a>
     {% endfor %}
 </div>
 
-{% cache 900 game_list selected_genre query page_obj.number %}
+<div>
+    {% if sort == 'rating' %}
+        <a href="?{% if selected_genre %}genre={{ selected_genre }}&{% endif %}{% if query %}q={{ query }}&{% endif %}">Сортировка: по рейтингу</a>
+    {% else %}
+        <a href="?{% if selected_genre %}genre={{ selected_genre }}&{% endif %}{% if query %}q={{ query }}&{% endif %}sort=rating">Сортировка: по названию</a>
+    {% endif %}
+</div>
+
+{% cache 900 game_list selected_genre query sort page_obj.number games_version %}
 <div>
     {% for game in page_obj %}
         <div>
@@ -27,6 +35,7 @@
             <h3><a href="{% url 'game_detail' game.slug %}">{{ game.title }}</a></h3>
             {% if game.developer %}<p>{{ game.developer }}</p>{% endif %}
             {% if game.release_date %}<p>{{ game.release_date }}</p>{% endif %}
+            {% if game.avg_rating %}<p>Рейтинг: {{ game.avg_rating|floatformat:1 }} / 10</p>{% endif %}
         </div>
     {% empty %}
         <p>Игры не найдены.</p>
@@ -37,14 +46,14 @@
 {% if page_obj.has_other_pages %}
 <div class="pagination">
     {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}{% if query %}&q={{ query }}{% endif %}">←</a>
+        <a href="?page={{ page_obj.previous_page_number }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}{% if query %}&q={{ query }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}">←</a>
     {% endif %}
 
     {% for p in first_pages %}
         {% if p == page_obj.number %}
             <strong>{{ p }}</strong>
         {% else %}
-            <a href="?page={{ p }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}{% if query %}&q={{ query }}{% endif %}">{{ p }}</a>
+            <a href="?page={{ p }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}{% if query %}&q={{ query }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}">{{ p }}</a>
         {% endif %}
     {% endfor %}
 
@@ -58,12 +67,12 @@
         {% if p == page_obj.number %}
             <strong>{{ p }}</strong>
         {% else %}
-            <a href="?page={{ p }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}{% if query %}&q={{ query }}{% endif %}">{{ p }}</a>
+            <a href="?page={{ p }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}{% if query %}&q={{ query }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}">{{ p }}</a>
         {% endif %}
     {% endfor %}
 
     {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}{% if query %}&q={{ query }}{% endif %}">→</a>
+        <a href="?page={{ page_obj.next_page_number }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}{% if query %}&q={{ query }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}">→</a>
     {% endif %}
 </div>
 {% endif %}

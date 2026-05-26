@@ -36,6 +36,7 @@
                             <a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a>
                             <span>{{ post.author.username }}</span>
                             <span>{{ post.created_at|date:"d.m.Y" }}</span>
+                            {% if post.tags %}<span>{{ post.tags }}</span>{% endif %}
                         </li>
                     {% endfor %}
                 </ul>
