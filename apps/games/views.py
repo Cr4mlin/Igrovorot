@@ -1,30 +1,38 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.exceptions import PermissionDenied
+from django.core.cache import cache
 from django.views import View
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import never_cache
 from django.core.paginator import Paginator
-from django.db.models import Avg
+from django.db.models import Avg, F
 from games.models import Game, Genre
 from games.steam import get_steam_game_details
 from reviews.models import Review
 from reviews.forms import ReviewForm
 
 
+@method_decorator(never_cache, name='get')
 class GameListView(View):
     template_name = 'games/game_list.html'
 
     def get(self, request):
-        games = Game.objects.all().order_by('title')
+        games = Game.objects.annotate(avg_rating=Avg('review__rating'))
         genres = Genre.objects.all().order_by('name')
 
-        # Фильтрация по жанру
         genre_slug = request.GET.get('genre')
         if genre_slug:
             games = games.filter(gamegenre__genre__slug=genre_slug)
 
-        # Поиск по названию
         query = request.GET.get('q')
         if query:
             games = games.filter(title__icontains=query)
+
+        sort = request.GET.get('sort')
+        if sort == 'rating':
+            games = games.order_by(F('avg_rating').desc(nulls_last=True))
+        else:
+            games = games.order_by('title')
 
         paginator = Paginator(games, 12)
         page_number = request.GET.get('page')
@@ -35,14 +43,18 @@ class GameListView(View):
         last_pages = list(range(max(num_pages - 2, 4), num_pages + 1))
         show_dots = last_pages and last_pages[0] > first_pages[-1] + 1
 
+        games_version = cache.get('games_list_version', 0)
+
         return render(request, self.template_name, {
             'page_obj': page_obj,
             'genres': genres,
             'selected_genre': genre_slug,
             'query': query or '',
+            'sort': sort or '',
             'first_pages': first_pages,
             'last_pages': last_pages,
             'show_dots': show_dots,
+            'games_version': games_version,
         })
 
 

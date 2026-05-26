@@ -199,7 +199,8 @@ class SearchView(View):
         if search_term:
             games = Game.objects.filter(title__icontains=search_term).order_by('title')[:10]
             posts = Post.objects.filter(
-                Q(title__icontains=search_term) | Q(content__icontains=search_term), is_published=True
+                Q(title__icontains=search_term) | Q(content__icontains=search_term) | Q(tags__icontains=search_term),
+                is_published=True
             ).select_related('author').order_by('-created_at')[:10]
             users = User.objects.filter(username__icontains=search_term).order_by('username')[:10]
         response = render(request, self.template_name, {

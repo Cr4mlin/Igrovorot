@@ -6,32 +6,39 @@ function applyLikeState(btn, liked, count) {
 function initLikeButton(btn) {
     const postId = btn.dataset.postId;
     const reviewId = btn.dataset.reviewId;
-    const statusParam = postId ? 'post_id=' + postId : 'review_id=' + reviewId;
-    const bodyParam = postId ? 'post_id=' + postId : 'review_id=' + reviewId;
+    const param = postId ? 'post_id=' + postId : 'review_id=' + reviewId;
 
-    fetch('/social/like/status/?' + statusParam)
-        .then(r => r.json())
-        .then(data => applyLikeState(btn, data.liked, data.count));
+    ajaxDeferred('/social/like/status/?' + param)
+        .done(function (data) {
+            applyLikeState(btn, data.liked, data.count);
+        })
+        .fail(function (err) {
+            console.error('Не удалось загрузить состояние лайка', err);
+        });
 
     btn.addEventListener('click', function () {
-        fetch('/social/like/', {
+        btn.disabled = true;
+
+        ajaxDeferred('/social/like/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'X-CSRFToken': getCsrfToken(),
             },
-            body: bodyParam,
+            body: param,
         })
-            .then(function (response) {
-                if (response.status === 401) {
-                    window.location.href = '/accounts/login/';
-                    return null;
-                }
-                return response.json();
-            })
-            .then(function (data) {
-                if (!data) return;
+            .done(function (data) {
                 applyLikeState(btn, data.liked, data.count);
+            })
+            .fail(function (err) {
+                if (err.status === 401) {
+                    window.location.href = '/accounts/login/';
+                } else {
+                    console.error('Ошибка при лайке', err);
+                }
+            })
+            .always(function () {
+                btn.disabled = false;
             });
     });
 }
