@@ -106,11 +106,11 @@
                     <tbody>
                         {% for game in steam_games %}
                         <tr>
-                            <td>
+                            <td class="steam-table__game">
                                 {% if game.icon_url %}
-                                    <img src="{{ game.icon_url }}" alt="{{ game.name }}" width="32" height="32">
+                                    <img src="{{ game.icon_url }}" alt="" width="32" height="32">
                                 {% endif %}
-                                {{ game.name }}
+                                <span>{{ game.name }}</span>
                             </td>
                             <td>{{ game.playtime_hours }} ч.</td>
                         </tr>

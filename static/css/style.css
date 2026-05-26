@@ -771,6 +771,7 @@ textarea { min-height: 110px; resize: vertical; }
 .steam-table { width: 100%; border-collapse: collapse; }
 .steam-table th { text-align: left; font-size: 12px; color: var(--text-dim); font-weight: 600; padding: 8px 0; border-bottom: 1px solid var(--card-border); }
 .steam-table td { padding: 8px 4px; font-size: 13px; color: var(--text-muted); border-bottom: 1px solid var(--card-border); }
+.steam-table__game { display: flex; align-items: center; gap: 10px; }
 .steam-table tr:last-child td { border-bottom: none; }
 
 /* ── FOLLOW BUTTON ──────────────────────────────────────── */
