@@ -7,19 +7,18 @@ class Game(models.Model):
     cover = models.CharField(max_length=512, blank=True, null=True)
     release_date = models.DateField(blank=True, null=True)
     developer = models.CharField(max_length=255, blank=True, null=True)
+    steam_app_id = models.IntegerField(blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'game'
 
 
 class GameGenre(models.Model):
     pk = models.CompositePrimaryKey('game_id', 'genre_id')
-    game = models.ForeignKey(Game, models.DO_NOTHING)
-    genre = models.ForeignKey('Genre', models.DO_NOTHING)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    genre = models.ForeignKey('Genre', on_delete=models.CASCADE)
 
     class Meta:
-        managed = False
         db_table = 'game_genre'
 
 
@@ -28,5 +27,4 @@ class Genre(models.Model):
     slug = models.CharField(unique=True, max_length=120)
 
     class Meta:
-        managed = False
         db_table = 'genre'
