@@ -22,20 +22,41 @@
         </div>
     </div>
 
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
     {% if can_edit %}
-        <a href="{% url 'post_edit' post.pk %}">Редактировать</a>
-        <a href="{% url 'post_delete' post.pk %}">Удалить</a>
+        <a href="{% url 'post_edit' post.pk %}" class="btn btn--outlined btn--sm">Редактировать</a>
+        <a href="{% url 'post_delete' post.pk %}" class="btn btn--danger btn--sm">Удалить</a>
     {% elif request.user.is_authenticated %}
-        <form method="post" action="{% url 'report_create' 'posts' 'post' post.pk %}" style="display:inline">
+        <form method="post" action="{% url 'report_create' 'posts' 'post' post.pk %}" style="display:inline-flex;gap:6px;align-items:center">
             {% csrf_token %}
-            <input type="text" name="reason" placeholder="Причина жалобы" required>
-            <button type="submit">Пожаловаться</button>
+            <input type="text" name="reason" placeholder="Причина жалобы" required style="width:200px">
+            <button type="submit" class="btn btn--ghost btn--sm">Пожаловаться</button>
         </form>
     {% endif %}
+    </div>
 
-    {% if post.image %}
-        <img class="post-detail__image" src="{{ post.image.url }}" alt="{{ post.title }}">
-    {% endif %}
+    {% with imgs=post.images.all %}
+        {% if imgs %}
+            {% if imgs|length == 1 %}
+                <img class="post-detail__image" src="{{ imgs.0.image.url }}" alt="{{ post.title }}">
+            {% else %}
+                <div class="gallery" style="margin-bottom:20px">
+                    <div class="gallery__main">
+                        <img class="gallery__active" id="post-gallery-main" src="{{ imgs.0.image.url }}" alt="{{ post.title }}">
+                    </div>
+                    <div class="gallery__thumbs">
+                        {% for img in imgs %}
+                            <img class="gallery__thumb {% if forloop.first %}gallery__thumb--active{% endif %}"
+                                 src="{{ img.image.url }}" alt=""
+                                 onclick="gallerySelect(this, 'post-gallery-main')">
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        {% elif post.image %}
+            <img class="post-detail__image" src="{{ post.image.url }}" alt="{{ post.title }}">
+        {% endif %}
+    {% endwith %}
 
     <div class="post-detail__content">{{ post.content|linebreaks }}</div>
 
@@ -65,7 +86,7 @@
                         {% if request.user == comment.author or is_moderator %}
                             <form method="post" action="{% url 'comment_delete' comment.pk %}" style="display:inline">
                                 {% csrf_token %}
-                                <button type="submit">Удалить</button>
+                                <button type="submit" class="btn btn--danger btn--sm">Удалить</button>
                             </form>
                         {% endif %}
                     </div>
@@ -83,7 +104,7 @@
             <form method="post">
                 {% csrf_token %}
                 {{ form }}
-                <button type="submit">Отправить</button>
+                <button type="submit" class="btn btn--primary">Отправить</button>
             </form>
         </div>
     {% else %}
@@ -98,4 +119,14 @@
 <script src="{% static 'js/csrf.js' %}"></script>
 <script src="{% static 'js/deferred.js' %}"></script>
 <script src="{% static 'js/like.js' %}"></script>
+<script>
+function gallerySelect(thumb, mainId) {
+    document.getElementById(mainId).src = thumb.src;
+    thumb.closest('.gallery__thumbs').querySelectorAll('.gallery__thumb').forEach(function(t) {
+        t.classList.remove('gallery__thumb--active');
+    });
+    thumb.classList.add('gallery__thumb--active');
+    thumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+}
+</script>
 {% endblock %}

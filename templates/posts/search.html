@@ -4,7 +4,9 @@
 {% block content %}
 <div class="search">
     {% if from_cookie %}
-        <p>Показаны результаты вашего последнего поиска: <strong>{{ q }}</strong></p>
+        <div class="search__cookie-notice">
+            Показаны результаты вашего последнего поиска: <strong>{{ q }}</strong>
+        </div>
     {% endif %}
 
     {% if q %}

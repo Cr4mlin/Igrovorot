@@ -16,6 +16,16 @@ class Post(models.Model):
         db_table = 'post'
 
 
+class PostImage(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='posts_images/')
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        db_table = 'post_image'
+        ordering = ['order']
+
+
 class Comment(models.Model):
     post = models.ForeignKey('Post', on_delete=models.CASCADE)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

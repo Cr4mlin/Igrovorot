@@ -37,21 +37,23 @@
                 <span class="profile__stat"><strong>{{ following_count }}</strong> подписок</span>
             </div>
 
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             {% if request.user == profile_user %}
-                <a href="{% url 'profile_edit' %}">Редактировать профиль</a>
+                <a href="{% url 'profile_edit' %}" class="btn btn--outlined btn--sm">Редактировать профиль</a>
             {% elif request.user.is_authenticated %}
-                <form method="post" action="{% url 'report_create' 'users' 'user' profile_user.pk %}" style="display:inline">
-                    {% csrf_token %}
-                    <input type="text" name="reason" placeholder="Причина жалобы" required>
-                    <button type="submit">Пожаловаться</button>
-                </form>
                 <button class="follow-btn {% if is_following %}follow-btn--active{% endif %}"
                         data-username="{{ profile_user.username }}">
                     {% if is_following %}Отписаться{% else %}Подписаться{% endif %}
                 </button>
+                <form method="post" action="{% url 'report_create' 'users' 'user' profile_user.pk %}" style="display:inline-flex;gap:6px;align-items:center">
+                    {% csrf_token %}
+                    <input type="text" name="reason" placeholder="Причина жалобы" required style="width:170px">
+                    <button type="submit" class="btn btn--ghost btn--sm">Пожаловаться</button>
+                </form>
             {% else %}
-                <a href="{% url 'login' %}">Войдите</a>, чтобы подписаться
+                <a href="{% url 'login' %}" class="btn btn--primary btn--sm">Войдите, чтобы подписаться</a>
             {% endif %}
+            </div>
         </div>
     </div>
 
@@ -104,11 +106,11 @@
                     <tbody>
                         {% for game in steam_games %}
                         <tr>
-                            <td>
+                            <td class="steam-table__game">
                                 {% if game.icon_url %}
-                                    <img src="{{ game.icon_url }}" alt="{{ game.name }}" width="32" height="32">
+                                    <img src="{{ game.icon_url }}" alt="" width="32" height="32">
                                 {% endif %}
-                                {{ game.name }}
+                                <span>{{ game.name }}</span>
                             </td>
                             <td>{{ game.playtime_hours }} ч.</td>
                         </tr>

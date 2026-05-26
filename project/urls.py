@@ -23,6 +23,7 @@ from posts.views import FeedView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', FeedView.as_view(), name='home'),
+    path('feed/', FeedView.as_view(), name='feed'),
     path('', include('users.urls')),
     path('', include('posts.urls')),
     path('', include('social.urls')),
