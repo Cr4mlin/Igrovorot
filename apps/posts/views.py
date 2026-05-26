@@ -5,7 +5,8 @@ from django.http import Http404
 from django.views import View
 from django.core.paginator import Paginator
 from django.utils import timezone
-from django.db.models import Q
+from django.db.models import Q, Count
+from datetime import timedelta
 from posts.models import Post, Comment
 from posts.forms import PostForm, CommentForm
 from social.models import Like, Follow
@@ -28,7 +29,46 @@ class PostListView(View):
         paginator = Paginator(posts, self.paginate_by)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
-        return render(request, self.template_name, {'page_obj': page_obj, 'current_tag': tag})
+
+        from collections import Counter
+        from django.contrib.auth import get_user_model
+        from games.models import Game
+        User = get_user_model()
+
+        all_tags = Post.objects.filter(is_published=True).exclude(tags='').exclude(tags__isnull=True).values_list('tags', flat=True)
+        tag_counter = Counter()
+        for tag_str in all_tags:
+            for t in tag_str.replace(',', ' ').split():
+                t = t.strip()
+                if t:
+                    tag_counter[t] += 1
+        popular_tags = tag_counter.most_common(12)
+
+        week_ago = timezone.now() - timedelta(days=7)
+        top_author_ids = (
+            Post.objects.filter(is_published=True, created_at__gte=week_ago)
+            .values('author_id')
+            .annotate(post_count=Count('id'))
+            .order_by('-post_count')[:4]
+        )
+        author_id_map = {row['author_id']: row['post_count'] for row in top_author_ids}
+        active_authors = User.objects.filter(pk__in=author_id_map.keys()).select_related('profile')
+        for author in active_authors:
+            author.recent_post_count = author_id_map[author.pk]
+            author.is_followed = (
+                request.user.is_authenticated and
+                Follow.objects.filter(follower=request.user, following=author).exists()
+            )
+
+        recommended_games = Game.objects.filter(cover__isnull=False).exclude(cover='').order_by('?')[:4]
+
+        return render(request, self.template_name, {
+            'page_obj': page_obj,
+            'current_tag': tag,
+            'popular_tags': popular_tags,
+            'active_authors': active_authors,
+            'recommended_games': recommended_games,
+        })
 
 
 class PostDetailView(View):
@@ -182,7 +222,33 @@ class FeedView(View):
         paginator = Paginator(posts, self.paginate_by)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
-        return render(request, self.template_name, {'page_obj': page_obj})
+        from games.models import Game
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+
+        recommended_games = Game.objects.filter(cover__isnull=False).exclude(cover='').order_by('?')[:4]
+
+        week_ago = timezone.now() - timedelta(days=7)
+        top_author_ids = (
+            Post.objects.filter(is_published=True, created_at__gte=week_ago)
+            .values('author_id')
+            .annotate(post_count=Count('id'))
+            .order_by('-post_count')[:3]
+        )
+        author_id_map = {row['author_id']: row['post_count'] for row in top_author_ids}
+        active_authors = User.objects.filter(pk__in=author_id_map.keys()).select_related('profile')
+        for author in active_authors:
+            author.recent_post_count = author_id_map[author.pk]
+            author.is_followed = (
+                request.user.is_authenticated and
+                Follow.objects.filter(follower=request.user, following=author).exists()
+            )
+
+        return render(request, self.template_name, {
+            'page_obj': page_obj,
+            'recommended_games': recommended_games,
+            'active_authors': active_authors,
+        })
 
 
 class SearchView(View):

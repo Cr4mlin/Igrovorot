@@ -22,16 +22,18 @@
         </div>
     </div>
 
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
     {% if can_edit %}
-        <a href="{% url 'post_edit' post.pk %}">Редактировать</a>
-        <a href="{% url 'post_delete' post.pk %}">Удалить</a>
+        <a href="{% url 'post_edit' post.pk %}" class="btn btn--outlined btn--sm">Редактировать</a>
+        <a href="{% url 'post_delete' post.pk %}" class="btn btn--danger btn--sm">Удалить</a>
     {% elif request.user.is_authenticated %}
-        <form method="post" action="{% url 'report_create' 'posts' 'post' post.pk %}" style="display:inline">
+        <form method="post" action="{% url 'report_create' 'posts' 'post' post.pk %}" style="display:inline-flex;gap:6px;align-items:center">
             {% csrf_token %}
-            <input type="text" name="reason" placeholder="Причина жалобы" required>
-            <button type="submit">Пожаловаться</button>
+            <input type="text" name="reason" placeholder="Причина жалобы" required style="width:200px">
+            <button type="submit" class="btn btn--ghost btn--sm">Пожаловаться</button>
         </form>
     {% endif %}
+    </div>
 
     {% if post.image %}
         <img class="post-detail__image" src="{{ post.image.url }}" alt="{{ post.title }}">
@@ -65,7 +67,7 @@
                         {% if request.user == comment.author or is_moderator %}
                             <form method="post" action="{% url 'comment_delete' comment.pk %}" style="display:inline">
                                 {% csrf_token %}
-                                <button type="submit">Удалить</button>
+                                <button type="submit" class="btn btn--danger btn--sm">Удалить</button>
                             </form>
                         {% endif %}
                     </div>
@@ -83,7 +85,7 @@
             <form method="post">
                 {% csrf_token %}
                 {{ form }}
-                <button type="submit">Отправить</button>
+                <button type="submit" class="btn btn--primary">Отправить</button>
             </form>
         </div>
     {% else %}

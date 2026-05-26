@@ -23,8 +23,8 @@
                 <option value="no" {% if published == 'no' %}selected{% endif %}>Неопубликованные</option>
             </select>
             <label><input type="checkbox" name="sort_posts" value="reports" {% if sort_posts == 'reports' %}checked{% endif %}> По жалобам ↓</label>
-            <button type="submit">Применить</button>
-            {% if q_posts or published or sort_posts %}<a href="?">Сбросить</a>{% endif %}
+            <button type="submit" class="btn btn--primary btn--sm">Применить</button>
+            {% if q_posts or published or sort_posts %}<a href="?" class="btn btn--ghost btn--sm">Сбросить</a>{% endif %}
         </form>
         {% if posts %}
             <table class="moderation__table">
@@ -47,14 +47,14 @@
                             <td>{% if post.is_published %}Да{% else %}Нет{% endif %}</td>
                             <td>
                                 {% if post.open_reports %}
-                                    <button onclick="toggleReports('post-reports-{{ post.pk }}')">
+                                    <button onclick="toggleReports('post-reports-{{ post.pk }}')" class="btn btn--outlined btn--sm">
                                         Жалоб: {{ post.open_reports|length }}
                                     </button>
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="{% url 'post_edit' post.pk %}">Редактировать</a>
-                                <a href="{% url 'post_delete' post.pk %}">Удалить</a>
+                                <a href="{% url 'post_edit' post.pk %}" class="btn btn--outlined btn--sm">Редактировать</a>
+                                <a href="{% url 'post_delete' post.pk %}" class="btn btn--danger btn--sm">Удалить</a>
                             </td>
                         </tr>
                         {% if post.open_reports %}
@@ -73,7 +73,7 @@
                                                     <td>
                                                         <form method="post" action="{% url 'report_resolve' report.pk %}">
                                                             {% csrf_token %}
-                                                            <button type="submit">Закрыть</button>
+                                                            <button type="submit" class="btn btn--ghost btn--sm">Закрыть</button>
                                                         </form>
                                                     </td>
                                                 </tr>
@@ -115,8 +115,8 @@
             <input type="hidden" name="sort_users" value="{{ sort_users }}">
             <input type="text" name="q_reviews" value="{{ q_reviews }}" placeholder="Поиск по игре или автору">
             <label><input type="checkbox" name="sort_reviews" value="reports" {% if sort_reviews == 'reports' %}checked{% endif %}> По жалобам ↓</label>
-            <button type="submit">Применить</button>
-            {% if q_reviews or sort_reviews %}<a href="?">Сбросить</a>{% endif %}
+            <button type="submit" class="btn btn--primary btn--sm">Применить</button>
+            {% if q_reviews or sort_reviews %}<a href="?" class="btn btn--ghost btn--sm">Сбросить</a>{% endif %}
         </form>
         {% if reviews %}
             <table class="moderation__table">
@@ -139,14 +139,14 @@
                             <td>{{ review.created_at|date:"d.m.Y" }}</td>
                             <td>
                                 {% if review.open_reports %}
-                                    <button onclick="toggleReports('review-reports-{{ review.pk }}')">
+                                    <button onclick="toggleReports('review-reports-{{ review.pk }}')" class="btn btn--outlined btn--sm">
                                         Жалоб: {{ review.open_reports|length }}
                                     </button>
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="{% url 'review_edit' review.pk %}">Редактировать</a>
-                                <a href="{% url 'review_delete' review.pk %}">Удалить</a>
+                                <a href="{% url 'review_edit' review.pk %}" class="btn btn--outlined btn--sm">Редактировать</a>
+                                <a href="{% url 'review_delete' review.pk %}" class="btn btn--danger btn--sm">Удалить</a>
                             </td>
                         </tr>
                         {% if review.open_reports %}
@@ -165,7 +165,7 @@
                                                     <td>
                                                         <form method="post" action="{% url 'report_resolve' report.pk %}">
                                                             {% csrf_token %}
-                                                            <button type="submit">Закрыть</button>
+                                                            <button type="submit" class="btn btn--ghost btn--sm">Закрыть</button>
                                                         </form>
                                                     </td>
                                                 </tr>
@@ -211,8 +211,8 @@
                 <option value="banned" {% if status == 'banned' %}selected{% endif %}>Заблокированные</option>
             </select>
             <label><input type="checkbox" name="sort_users" value="reports" {% if sort_users == 'reports' %}checked{% endif %}> По жалобам ↓</label>
-            <button type="submit">Применить</button>
-            {% if q_users or status or sort_users %}<a href="?">Сбросить</a>{% endif %}
+            <button type="submit" class="btn btn--primary btn--sm">Применить</button>
+            {% if q_users or status or sort_users %}<a href="?" class="btn btn--ghost btn--sm">Сбросить</a>{% endif %}
         </form>
         {% if users %}
             <table class="moderation__table">
@@ -246,7 +246,7 @@
                             </td>
                             <td>
                                 {% if u.open_reports %}
-                                    <button onclick="toggleReports('user-reports-{{ u.pk }}')">
+                                    <button onclick="toggleReports('user-reports-{{ u.pk }}')" class="btn btn--outlined btn--sm">
                                         Жалоб: {{ u.open_reports|length }}
                                     </button>
                                 {% endif %}
@@ -255,10 +255,10 @@
                                 {% if u.profile.is_banned %}
                                     <form method="post" action="{% url 'unban_user' u.username %}" style="display:inline">
                                         {% csrf_token %}
-                                        <button type="submit">Разблокировать</button>
+                                        <button type="submit" class="btn btn--secondary btn--sm">Разблокировать</button>
                                     </form>
                                 {% else %}
-                                    <a href="{% url 'ban_user' u.username %}">Заблокировать</a>
+                                    <a href="{% url 'ban_user' u.username %}" class="btn btn--danger btn--sm">Заблокировать</a>
                                 {% endif %}
                             </td>
                         </tr>
@@ -278,7 +278,7 @@
                                                     <td>
                                                         <form method="post" action="{% url 'report_resolve' report.pk %}">
                                                             {% csrf_token %}
-                                                            <button type="submit">Закрыть</button>
+                                                            <button type="submit" class="btn btn--ghost btn--sm">Закрыть</button>
                                                         </form>
                                                     </td>
                                                 </tr>
