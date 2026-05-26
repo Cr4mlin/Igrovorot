@@ -626,11 +626,32 @@ textarea { min-height: 110px; resize: vertical; }
 }
 .game-detail__meta span::before { content: ''; }
 .game-detail__desc { font-size: 14px; line-height: 1.75; color: var(--text-muted); margin-bottom: 20px; }
-.game-detail__screenshots {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 10px; margin-bottom: 24px;
+.gallery { margin-bottom: 28px; }
+.gallery__main {
+  width: 100%; border-radius: var(--radius); overflow: hidden;
+  background: #000; margin-bottom: 10px;
+  aspect-ratio: 16/9;
 }
-.game-detail__screenshot { border-radius: var(--radius-sm); width: 100%; object-fit: cover; }
+.gallery__active {
+  width: 100%; height: 100%; object-fit: contain;
+  display: block; transition: opacity .2s;
+}
+.gallery__thumbs {
+  display: flex; gap: 8px;
+  overflow-x: auto; padding-bottom: 4px;
+  scrollbar-width: thin; scrollbar-color: var(--card-border) transparent;
+}
+.gallery__thumbs::-webkit-scrollbar { height: 4px; }
+.gallery__thumbs::-webkit-scrollbar-track { background: transparent; }
+.gallery__thumbs::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 4px; }
+.gallery__thumb {
+  width: 120px; height: 68px; object-fit: cover; flex-shrink: 0;
+  border-radius: var(--radius-sm); cursor: pointer;
+  border: 2px solid transparent; opacity: .55;
+  transition: opacity .2s, border-color .2s;
+}
+.gallery__thumb:hover { opacity: .85; }
+.gallery__thumb--active { border-color: var(--primary); opacity: 1; }
 .game-detail__actions { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
 .avg-rating {
   background: var(--card-bg); border: 1px solid var(--card-border);
@@ -829,24 +850,94 @@ body.sidebar-collapsed .sidebar__auth          { display: none; }
 body.sidebar-collapsed .app-wrapper            { margin-left: var(--sidebar-w-collapsed); }
 body.sidebar-collapsed .topbar                 { padding-left: calc(var(--sidebar-w-collapsed) + 28px); }
 
-/* ── RESPONSIVE ─────────────────────────────────────────── */
-@media (max-width: 960px) {
-  .profile__content { grid-template-columns: 1fr; }
-  .profile__steam   { grid-column: auto; }
+/* ── OVERLAY ────────────────────────────────────────────── */
+.sidebar-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.55);
+  z-index: 99;
+  backdrop-filter: blur(2px);
 }
+body.mobile-menu-open .sidebar-overlay { display: block; }
+
+/* ── TOPBAR BURGER ──────────────────────────────────────── */
+.topbar__burger {
+  display: none;
+  background: transparent; border: none;
+  color: var(--text-muted); padding: 6px;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0; transition: color .2s;
+}
+.topbar__burger:hover { color: var(--text); }
+
+/* ── RESPONSIVE 1100px ──────────────────────────────────── */
 @media (max-width: 1100px) {
   .feed-layout { grid-template-columns: 1fr; }
   .feed-sidebar { display: none; }
 }
+
+/* ── RESPONSIVE 960px ───────────────────────────────────── */
+@media (max-width: 960px) {
+  .profile__content { grid-template-columns: 1fr; }
+  .profile__steam   { grid-column: auto; }
+  .games-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+}
+
+/* ── RESPONSIVE 768px (планшет) ─────────────────────────── */
 @media (max-width: 768px) {
-  :root { --sidebar-w: 60px; }
-  .sidebar__logo a { font-size: 0; letter-spacing: 0; }
-  .sidebar__logo a::after { content: 'IG'; font-size: 14px; letter-spacing: 2px; }
-  .sidebar__link span  { display: none; }
-  .sidebar__username   { display: none; }
-  .sidebar__logout span { display: none; }
-  .sidebar__link { justify-content: center; padding: 10px; }
-  .sidebar__user { justify-content: center; }
+  :root { --sidebar-w: 220px; }
+
+  .topbar__burger { display: flex; }
+  .topbar { padding-left: 16px; }
+  body.sidebar-collapsed .topbar { padding-left: 16px; }
+
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform .25s ease, width .25s ease;
+    width: var(--sidebar-w) !important;
+    z-index: 200;
+  }
+  body.mobile-menu-open .sidebar { transform: translateX(0); }
+
+  .app-wrapper { margin-left: 0 !important; }
+  body.sidebar-collapsed .app-wrapper { margin-left: 0 !important; }
+
+  .topbar__search { flex: 1; }
   .page-content { padding: 20px 16px; }
-  .games-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .games-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+
+  .moderation__table { font-size: 12px; }
+  .moderation__table th,
+  .moderation__table td { padding: 8px 10px; }
+
+  .post-create, .post-delete, .review-delete, .profile-edit { max-width: 100%; }
+  .feed-layout > .feed,
+  .feed-layout > .post-list { width: 100%; margin: 0; }
+}
+
+/* ── RESPONSIVE 480px (мобильный) ───────────────────────── */
+@media (max-width: 480px) {
+  .topbar__search input::placeholder { font-size: 12px; }
+  .topbar__search button { padding: 8px 10px; font-size: 12px; }
+
+  .feed__item { padding: 14px 16px; }
+  .feed__title { font-size: 16px; }
+  .post-list__item { padding: 14px 16px; }
+
+  .game-detail__hero { max-height: 200px; }
+  .game-detail__info { grid-template-columns: 1fr; }
+
+  .games-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+  .game-card__title { font-size: 12px; }
+
+  .profile__header { flex-direction: column; align-items: flex-start; gap: 14px; }
+  .profile__avatar { width: 64px; height: 64px; font-size: 24px; }
+
+  .auth-card { padding: 24px 20px; margin: 16px; }
+
+  .btn { padding: 8px 14px; font-size: 13px; }
+  .btn--sm { padding: 5px 10px; font-size: 11px; }
+
+  h1 { font-size: 22px !important; }
+  h2 { font-size: 18px !important; }
 }

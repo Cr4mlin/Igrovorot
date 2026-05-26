@@ -85,8 +85,15 @@
         </div>
     </aside>
 
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
     <div class="app-wrapper">
         <header class="topbar">
+            <button class="topbar__burger" id="topbar-burger" aria-label="Меню">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
             <form method="get" action="{% url 'search' %}" class="topbar__search">
                 <input type="text" name="q" placeholder="Поиск игр, постов, пользователей..."
                        value="{{ request.GET.q|default:request.last_search }}">
@@ -118,12 +125,33 @@
 <script>
 (function () {
     var COLLAPSED_KEY = 'sidebar-collapsed';
-    if (localStorage.getItem(COLLAPSED_KEY) === 'true') {
+    var isMobile = function () { return window.innerWidth <= 768; };
+
+    if (!isMobile() && localStorage.getItem(COLLAPSED_KEY) === 'true') {
         document.body.classList.add('sidebar-collapsed');
     }
+
     document.getElementById('sidebar-toggle').addEventListener('click', function () {
-        var collapsed = document.body.classList.toggle('sidebar-collapsed');
-        localStorage.setItem(COLLAPSED_KEY, collapsed);
+        if (isMobile()) {
+            document.body.classList.toggle('mobile-menu-open');
+        } else {
+            var collapsed = document.body.classList.toggle('sidebar-collapsed');
+            localStorage.setItem(COLLAPSED_KEY, collapsed);
+        }
+    });
+
+    document.getElementById('topbar-burger').addEventListener('click', function () {
+        document.body.classList.toggle('mobile-menu-open');
+    });
+
+    document.getElementById('sidebar-overlay').addEventListener('click', function () {
+        document.body.classList.remove('mobile-menu-open');
+    });
+
+    window.addEventListener('resize', function () {
+        if (!isMobile()) {
+            document.body.classList.remove('mobile-menu-open');
+        }
     });
 })();
 </script>

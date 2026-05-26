@@ -50,10 +50,18 @@
     </div>
 
     {% if steam_data.screenshots %}
-        <div class="game-detail__screenshots">
-            {% for screenshot in steam_data.screenshots %}
-                <img class="game-detail__screenshot" src="{{ screenshot }}" alt="Скриншот">
-            {% endfor %}
+        <div class="gallery">
+            <div class="gallery__main">
+                <img class="gallery__active" id="gallery-main" src="{{ steam_data.screenshots.0 }}" alt="Скриншот">
+            </div>
+            <div class="gallery__thumbs" id="gallery-thumbs">
+                {% for screenshot in steam_data.screenshots %}
+                    <img class="gallery__thumb {% if forloop.first %}gallery__thumb--active{% endif %}"
+                         src="{{ screenshot }}"
+                         alt="Скриншот {{ forloop.counter }}"
+                         onclick="gallerySelect(this)">
+                {% endfor %}
+            </div>
         </div>
     {% endif %}
 
@@ -155,4 +163,14 @@
 <script src="{% static 'js/csrf.js' %}"></script>
 <script src="{% static 'js/deferred.js' %}"></script>
 <script src="{% static 'js/like.js' %}"></script>
+<script>
+function gallerySelect(thumb) {
+    document.getElementById('gallery-main').src = thumb.src;
+    document.querySelectorAll('.gallery__thumb').forEach(function(t) {
+        t.classList.remove('gallery__thumb--active');
+    });
+    thumb.classList.add('gallery__thumb--active');
+    thumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+}
+</script>
 {% endblock %}
