@@ -82,7 +82,6 @@ class GameDetailView(View):
         game = get_object_or_404(Game, slug=slug)
         genres = game.gamegenre_set.select_related('genre').all()
 
-        # Подтягиваем данные из Steam если есть app_id
         steam_data = None
         if game.steam_app_id:
             steam_data = get_steam_game_details(game.steam_app_id)

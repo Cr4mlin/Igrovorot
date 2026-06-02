@@ -35,12 +35,10 @@ def get_steam_game_details(app_id):
 
         details = game_data['data']
 
-        # Скриншоты
         screenshots = [
             s['path_full'] for s in details.get('screenshots', [])[:6]
         ]
 
-        # Рейтинг
         metacritic = details.get('metacritic', {})
 
         return {

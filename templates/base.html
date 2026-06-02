@@ -7,6 +7,7 @@
     <title>{% block title %}Igrovorot{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="icon" href="{% static 'img/NEW LOGO MINI.ico' %}" type="image/x-icon">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
@@ -14,7 +15,10 @@
 <div class="layout">
     <aside class="sidebar">
         <div class="sidebar__logo" id="sidebar-toggle" title="Свернуть/развернуть меню">
-            <a href="/" onclick="return false;"><img src="{% static 'img/logo.png' %}" alt="Igrovorot" height="32" style="display:block"></a>
+            <a href="/" onclick="return false;">
+                <img class="sidebar__logo-full" src="{% static 'img/NEW LOGO.png' %}" alt="Igrovorot" height="32" style="display:block">
+                <img class="sidebar__logo-mini" src="{% static 'img/NEW LOGO MINI.png' %}" alt="Igrovorot" height="32" style="display:none">
+            </a>
             <svg class="sidebar__logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
                 <polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/>
             </svg>
@@ -94,9 +98,10 @@
                     <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
                 </svg>
             </button>
-            <form method="get" action="{% url 'search' %}" class="topbar__search">
+            <form method="get" action="{% url 'search' %}" class="topbar__search" id="search-form">
                 <input type="text" name="q" placeholder="Поиск игр, постов, пользователей..."
-                       value="{{ request.GET.q|default:request.last_search }}">
+                       value="{{ request.GET.q }}"
+                       data-last-search="{{ request.last_search }}">
                 <button type="submit">Найти</button>
             </form>
             {% if not user.is_authenticated %}
@@ -121,6 +126,14 @@
 </div>
 
 <script src="{% static 'js/validate.js' %}"></script>
+<script>
+document.getElementById('search-form').addEventListener('submit', function () {
+    var input = this.querySelector('input[name="q"]');
+    if (!input.value.trim()) {
+        input.value = input.dataset.lastSearch;
+    }
+});
+</script>
 {% block scripts %}{% endblock %}
 <script>
 (function () {
