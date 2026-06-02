@@ -88,6 +88,16 @@ class PostDetailView(View):
             request.user.is_authenticated and
             Like.objects.filter(user=request.user, post=post, review=None).exists()
         )
+        other_posts = Post.objects.filter(
+            author=post.author, is_published=True
+        ).exclude(pk=post.pk).order_by('-created_at')[:4]
+
+        author_is_followed = (
+            request.user.is_authenticated and
+            Follow.objects.filter(follower=request.user, following=post.author).exists()
+        )
+        followers_count = Follow.objects.filter(following=post.author).count()
+
         return render(request, self.template_name, {
             'post': post,
             'comments': comments,
@@ -96,6 +106,9 @@ class PostDetailView(View):
             'likes_count': likes_count,
             'user_liked': user_liked,
             'is_moderator': is_moderator,
+            'other_posts': other_posts,
+            'author_is_followed': author_is_followed,
+            'followers_count': followers_count,
         })
 
     def post(self, request, pk):

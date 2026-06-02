@@ -7,13 +7,14 @@
     <title>{% block title %}Igrovorot{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="icon" href="{% static 'img/NEW LOGO MINI.ico' %}" type="image/x-icon">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
 <div class="auth-page">
     <div class="auth-card">
         <div class="auth-card__logo">
-            <a href="/"><img src="{% static 'img/logo.png' %}" alt="Igrovorot" style="display:inline-block;width:70%;height:auto"></a>
+            <a href="/"><img src="{% static 'img/NEW LOGO.png' %}" alt="Igrovorot" style="display:inline-block;width:70%;height:auto"></a>
         </div>
         {% if messages %}
             {% for message in messages %}
