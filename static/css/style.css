@@ -34,7 +34,7 @@ button, input, textarea, select { font-family: var(--font); cursor: pointer; }
 
 /* ── BASE ───────────────────────────────────────────────── */
 body {
-  background: var(--bg);
+  background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('/static/img/back.png') center / cover no-repeat fixed var(--bg);
   color: var(--text);
   font-family: var(--font);
   font-size: 14px;
@@ -541,8 +541,61 @@ textarea { min-height: 110px; resize: vertical; }
 .post-list__excerpt { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
 .post-list__empty { color: var(--text-dim); font-size: 13px; padding: 40px 0; text-align: center; }
 
+/* ── POST DETAIL LAYOUT ─────────────────────────────────── */
+.post-detail-layout {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 28px;
+    align-items: start;
+}
+.post-detail-sidebar {
+    position: sticky;
+    top: calc(var(--topbar-h) + 20px);
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+.widget__author-card { display: flex; flex-direction: column; }
+.widget__author-card-link {
+    display: flex; align-items: center; gap: 12px;
+    text-decoration: none; margin-bottom: 10px;
+}
+.widget__avatar--lg {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--primary-dim); color: var(--primary);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 20px; flex-shrink: 0; overflow: hidden;
+}
+.widget__avatar--lg img { width: 100%; height: 100%; object-fit: cover; }
+.widget__author-bio {
+    font-size: 13px; color: var(--text-dim); line-height: 1.5;
+    margin: 0; border-top: 1px solid var(--card-border); padding-top: 10px;
+}
+.widget__other-posts { display: flex; flex-direction: column; gap: 10px; }
+.widget__other-post {
+    display: flex; gap: 10px; align-items: center;
+    text-decoration: none; color: var(--text);
+    padding: 6px; border-radius: 8px; transition: background .15s;
+}
+.widget__other-post:hover { background: var(--card-border); }
+.widget__other-post-img {
+    width: 60px; height: 44px; object-fit: cover;
+    border-radius: 6px; flex-shrink: 0;
+}
+.widget__other-post-img--placeholder {
+    width: 60px; height: 44px; border-radius: 6px;
+    background: var(--card-border); flex-shrink: 0;
+}
+.widget__other-post-info { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.widget__other-post-title {
+    font-size: 13px; font-weight: 500; line-height: 1.3;
+    overflow: hidden; text-overflow: ellipsis; display: -webkit-box;
+    -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+}
+.widget__other-post-date { font-size: 11px; color: var(--text-dim); }
+
 /* ── POST DETAIL ────────────────────────────────────────── */
-.post-detail { max-width: 760px; }
+.post-detail { max-width: 100%; }
 .post-detail__title { font-size: 28px; font-weight: 700; margin-bottom: 10px; }
 .post-detail__meta {
   display: flex; align-items: center; flex-wrap: wrap;
@@ -906,8 +959,9 @@ textarea { min-height: 110px; resize: vertical; }
 /* ── SIDEBAR COLLAPSED ──────────────────────────────────── */
 body.sidebar-collapsed .sidebar                { width: var(--sidebar-w-collapsed); }
 body.sidebar-collapsed .sidebar__logo          { padding: 0; justify-content: center; }
-body.sidebar-collapsed .sidebar__logo img      { display: none; }
-body.sidebar-collapsed .sidebar__logo-icon     { display: block; }
+body.sidebar-collapsed .sidebar__logo-full     { display: none !important; }
+body.sidebar-collapsed .sidebar__logo-mini     { display: block !important; }
+body.sidebar-collapsed .sidebar__logo-icon     { display: none; }
 body.sidebar-collapsed .sidebar__link          { justify-content: center; padding: 10px; }
 body.sidebar-collapsed .sidebar__link span     { display: none; }
 body.sidebar-collapsed .sidebar__user          { justify-content: center; padding: 10px; }
@@ -942,6 +996,8 @@ body.mobile-menu-open .sidebar-overlay { display: block; }
 @media (max-width: 1100px) {
   .feed-layout { grid-template-columns: 1fr; }
   .feed-sidebar { display: none; }
+  .post-detail-layout { grid-template-columns: 1fr; }
+  .post-detail-sidebar { position: static; }
 }
 
 /* ── RESPONSIVE 960px ───────────────────────────────────── */

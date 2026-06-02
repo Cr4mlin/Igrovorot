@@ -3,6 +3,23 @@
 {% block content %}
 <div class="post-create">
     <h1>Редактировать пост</h1>
+    {% if post.images.all %}
+        <div class="form-group">
+            <label>Текущие изображения</label>
+            <div class="post-images-existing">
+                {% for img in post.images.all %}
+                    <div class="post-images-existing__item">
+                        <img src="{{ img.image.url }}" alt="">
+                        <form method="post" action="{% url 'post_image_delete' img.pk %}" class="post-images-existing__delete">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn--danger btn--sm" title="Удалить">×</button>
+                        </form>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
     <form method="post" enctype="multipart/form-data" novalidate>
         {% csrf_token %}
         {% for field in form %}
@@ -12,23 +29,6 @@
                 {% for error in field.errors %}<span class="form-error">{{ error }}</span>{% endfor %}
             </div>
         {% endfor %}
-
-        {% if post.images.all %}
-            <div class="form-group">
-                <label>Текущие изображения</label>
-                <div class="post-images-existing">
-                    {% for img in post.images.all %}
-                        <div class="post-images-existing__item">
-                            <img src="{{ img.image.url }}" alt="">
-                            <form method="post" action="{% url 'post_image_delete' img.pk %}" class="post-images-existing__delete">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn--danger btn--sm" title="Удалить">×</button>
-                            </form>
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-        {% endif %}
 
         <div class="form-group">
             <label>Добавить изображения</label>

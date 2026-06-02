@@ -13,22 +13,18 @@ def resolve_steam_id(steam_input):
 
     steam_input = steam_input.strip()
 
-    # Уже числовой Steam ID
     if re.match(r'^\d{17}$', steam_input):
         return steam_input
 
-    # Ссылка с числовым ID: steamcommunity.com/profiles/76561198012345678
     match = re.search(r'/profiles/(\d{17})', steam_input)
     if match:
         return match.group(1)
 
-    # Ссылка с username: steamcommunity.com/id/username
     match = re.search(r'/id/([^/]+)', steam_input)
     if match:
         username = match.group(1)
         return resolve_vanity_url(username)
 
-    # Просто username без ссылки
     return resolve_vanity_url(steam_input)
 
 
@@ -55,7 +51,7 @@ def get_steam_games(steam_id):
             'steamid': steam_id,
             'include_appinfo': True,
             'include_played_free_games': True,
-        }, timeout=5)  # ← таймаут 5 секунд
+        }, timeout=5)
         data = response.json()
         games = data.get('response', {}).get('games', [])
         games.sort(key=lambda x: x.get('playtime_forever', 0), reverse=True)
