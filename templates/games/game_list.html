@@ -59,6 +59,7 @@
 {% if page_obj.has_other_pages %}
 <div class="pagination">
     {% if page_obj.has_previous %}
+        <a href="?page=1{% if selected_genre %}&genre={{ selected_genre }}{% endif %}{% if query %}&q={{ query }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}">«</a>
         <a href="?page={{ page_obj.previous_page_number }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}{% if query %}&q={{ query }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}">←</a>
     {% endif %}
 
@@ -72,8 +73,6 @@
 
     {% if show_dots %}
         <span>…</span>
-        <strong>{{ page_obj.number }}</strong>
-        <span>…</span>
     {% endif %}
 
     {% for p in last_pages %}
@@ -86,6 +85,7 @@
 
     {% if page_obj.has_next %}
         <a href="?page={{ page_obj.next_page_number }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}{% if query %}&q={{ query }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}">→</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}{% if query %}&q={{ query }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}">»</a>
     {% endif %}
 </div>
 {% endif %}

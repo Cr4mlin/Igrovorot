@@ -39,9 +39,16 @@ class GameListView(View):
         page_obj = paginator.get_page(page_number)
 
         num_pages = paginator.num_pages
-        first_pages = list(range(1, min(4, num_pages + 1)))
-        last_pages = list(range(max(num_pages - 2, 4), num_pages + 1))
+        left_start = max(1, page_obj.number - 1)
+        left_end = min(num_pages, left_start + 2)
+        left_start = max(1, left_end - 2)
+        first_pages = list(range(left_start, left_end + 1))
+        last_start = max(num_pages - 2, first_pages[-1] + 1)
+        last_pages = list(range(last_start, num_pages + 1))
         show_dots = last_pages and last_pages[0] > first_pages[-1] + 1
+        if not show_dots:
+            first_pages = list(range(max(1, num_pages - 5), num_pages + 1))
+            last_pages = []
 
         games_version = cache.get('games_list_version', 0)
 
