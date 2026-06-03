@@ -1,6 +1,10 @@
 import re
 
 import requests
+from django.core.cache import cache
+from django.utils.text import slugify
+
+from games.models import Game, GameGenre, Genre
 
 
 def clean_requirement_heading(requirements):
@@ -18,6 +22,72 @@ def clean_requirement_heading(requirements):
         cleaned = re.sub(pattern, '', cleaned, count=1, flags=re.IGNORECASE)
 
     return cleaned
+
+
+def make_unique_game_slug(title, app_id):
+    base_slug = slugify(title) or f'game-{app_id}'
+    slug = base_slug
+    counter = 1
+
+    while Game.objects.filter(slug=slug).exists():
+        slug = f'{base_slug}-{counter}'
+        counter += 1
+
+    return slug
+
+
+def sync_steam_owned_games(owned_games, limit=3):
+    """
+    Добавляет в каталог отсутствующие игры из Steam-библиотеки пользователя.
+    Ограничение нужно, чтобы открытие профиля не делало десятки Steam API запросов.
+    """
+    created = 0
+
+    for owned_game in owned_games:
+        if created >= limit:
+            break
+
+        app_id = owned_game.get('appid')
+        title = (owned_game.get('name') or '').strip()
+        if not app_id or not title:
+            continue
+
+        if Game.objects.filter(steam_app_id=app_id).exists():
+            continue
+
+        details = get_steam_game_details(app_id)
+        description = None
+        developer = None
+        genres = []
+
+        if details:
+            description = details.get('short_description') or None
+            developer = (details.get('developers') or [None])[0]
+            genres = details.get('genres') or []
+
+        game = Game.objects.create(
+            title=title,
+            slug=make_unique_game_slug(title, app_id),
+            description=description,
+            cover=f'https://cdn.akamai.steamstatic.com/steam/apps/{app_id}/header.jpg',
+            developer=developer,
+            steam_app_id=app_id,
+        )
+
+        for genre_name in genres:
+            genre_slug = slugify(genre_name) or f'genre-{genre_name}'
+            genre, _ = Genre.objects.get_or_create(
+                slug=genre_slug,
+                defaults={'name': genre_name},
+            )
+            GameGenre.objects.get_or_create(game=game, genre=genre)
+
+        created += 1
+
+    if created:
+        cache.set('games_list_version', cache.get('games_list_version', 0) + 1)
+
+    return created
 
 
 def search_steam_app_id(title):

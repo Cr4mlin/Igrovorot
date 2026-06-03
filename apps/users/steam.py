@@ -2,6 +2,8 @@ import re
 import requests
 from django.conf import settings
 
+from games.steam import sync_steam_owned_games
+
 
 def resolve_steam_id(steam_input):
     """
@@ -55,9 +57,15 @@ def get_steam_games(steam_id):
         data = response.json()
         games = data.get('response', {}).get('games', [])
         games.sort(key=lambda x: x.get('playtime_forever', 0), reverse=True)
+        visible_games = games[:20]
+
+        try:
+            sync_steam_owned_games(visible_games)
+        except Exception:
+            pass
 
         result = []
-        for game in games[:20]:
+        for game in visible_games:
             playtime = game.get('playtime_forever', 0)
             result.append({
                 'name': game.get('name', ''),
