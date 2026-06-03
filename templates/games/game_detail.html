@@ -30,12 +30,27 @@
         {% if game.release_date %}<span>Дата выхода: {{ game.release_date }}</span>{% endif %}
     </div>
 
-    {% if steam_data %}
-        {% if steam_data.short_description %}
-            <p class="game-detail__desc">{{ steam_data.short_description }}</p>
-        {% endif %}
+    {% if steam_data and steam_data.detailed_description %}
+        <section class="game-description">
+            <h2 class="game-description__title">Описание</h2>
+            <div class="game-description__content">
+                {{ steam_data.detailed_description|safe }}
+            </div>
+        </section>
+    {% elif steam_data and steam_data.short_description %}
+        <section class="game-description">
+            <h2 class="game-description__title">Описание</h2>
+            <div class="game-description__content">
+                <p>{{ steam_data.short_description }}</p>
+            </div>
+        </section>
     {% elif game.description %}
-        <p class="game-detail__desc">{{ game.description }}</p>
+        <section class="game-description">
+            <h2 class="game-description__title">Описание</h2>
+            <div class="game-description__content">
+                <p>{{ game.description }}</p>
+            </div>
+        </section>
     {% endif %}
 
     <div class="game-detail__actions">
@@ -69,7 +84,7 @@
 
     {% if steam_data.requirements_minimum or steam_data.requirements_recommended %}
         <div class="requirements">
-            <h2>Системные требования</h2>
+            <h2 class="requirements__title">Системные требования</h2>
             <div class="requirements__columns">
                 {% if steam_data.requirements_minimum %}
                     <div class="requirements__column">

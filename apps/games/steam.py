@@ -25,7 +25,7 @@ def get_steam_game_details(app_id):
         url = f'https://store.steampowered.com/api/appdetails'
         response = requests.get(url, params={
             'appids': app_id,
-            'l': 'english',
+            'l': 'russian',
         }, timeout=5)
         data = response.json()
         game_data = data.get(str(app_id), {})
@@ -46,6 +46,7 @@ def get_steam_game_details(app_id):
         return {
             'steam_url': f'https://store.steampowered.com/app/{app_id}/',
             'short_description': details.get('short_description', ''),
+            'detailed_description': details.get('detailed_description', ''),
             'screenshots': screenshots,
             'metacritic_score': metacritic.get('score'),
             'metacritic_url': metacritic.get('url'),
