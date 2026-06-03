@@ -49,6 +49,8 @@
         {% endif %}
     </div>
 
+
+
     {% if steam_data.screenshots %}
         <div class="gallery">
             <div class="gallery__main">
@@ -61,6 +63,26 @@
                          alt="Скриншот {{ forloop.counter }}"
                          onclick="gallerySelect(this)">
                 {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    {% if steam_data.requirements_minimum or steam_data.requirements_recommended %}
+        <div class="requirements">
+            <h2>Системные требования</h2>
+            <div class="requirements__columns">
+                {% if steam_data.requirements_minimum %}
+                    <div class="requirements__column">
+                        <h3>Минимальные</h3>
+                        {{ steam_data.requirements_minimum|safe }}
+                    </div>
+                {% endif %}
+                {% if steam_data.requirements_recommended %}
+                    <div class="requirements__column">
+                        <h3>Рекомендуемые</h3>
+                        {{ steam_data.requirements_recommended|safe }}
+                    </div>
+                {% endif %}
             </div>
         </div>
     {% endif %}

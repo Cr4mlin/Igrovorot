@@ -41,6 +41,8 @@ def get_steam_game_details(app_id):
 
         metacritic = details.get('metacritic', {})
 
+        pc_requirements = details.get('pc_requirements', {})
+
         return {
             'steam_url': f'https://store.steampowered.com/app/{app_id}/',
             'short_description': details.get('short_description', ''),
@@ -52,6 +54,8 @@ def get_steam_game_details(app_id):
             'developers': details.get('developers', []),
             'publishers': details.get('publishers', []),
             'genres': [g['description'] for g in details.get('genres', [])],
+            'requirements_minimum': pc_requirements.get('minimum', ''),
+            'requirements_recommended': pc_requirements.get('recommended', ''),
         }
     except Exception:
         return None
