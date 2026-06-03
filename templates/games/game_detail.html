@@ -12,7 +12,7 @@
 
     <div class="game-detail__genres">
         {% for gg in genres %}
-            <span class="game-detail__genre">{{ gg.genre.name }}</span>
+            <a href="{% url 'games' %}?genre={{ gg.genre.slug }}" class="game-detail__genre">{{ gg.genre.name }}</a>
         {% endfor %}
     </div>
 
@@ -66,16 +66,40 @@
 
 
 
-    {% if steam_data.screenshots %}
+    {% if steam_data.trailers or steam_data.screenshots %}
         <div class="gallery">
-            <div class="gallery__main">
-                <img class="gallery__active" id="gallery-main" src="{{ steam_data.screenshots.0 }}" alt="Скриншот">
+            <div class="gallery__main" id="gallery-main-wrap">
+                {% if steam_data.trailers %}
+                    {% with first_trailer=steam_data.trailers.0 %}
+                    <video class="gallery__active"
+                           id="gallery-main"
+                           controls
+                           poster="{{ first_trailer.thumb }}"
+                           data-src="{{ first_trailer.url }}"
+                           data-video-type="{{ first_trailer.type }}">
+                    </video>
+                    {% endwith %}
+                {% else %}
+                    <img class="gallery__active" id="gallery-main" src="{{ steam_data.screenshots.0 }}" alt="Скриншот">
+                {% endif %}
             </div>
             <div class="gallery__thumbs" id="gallery-thumbs">
+                {% for trailer in steam_data.trailers %}
+                    <img class="gallery__thumb gallery__thumb--video {% if forloop.first %}gallery__thumb--active{% endif %}"
+                         src="{{ trailer.thumb|default:steam_data.header_image }}"
+                         alt="{{ trailer.name }}"
+                         data-type="video"
+                         data-src="{{ trailer.url }}"
+                         data-video-type="{{ trailer.type }}"
+                         data-poster="{{ trailer.thumb }}"
+                         onclick="gallerySelect(this)">
+                {% endfor %}
                 {% for screenshot in steam_data.screenshots %}
-                    <img class="gallery__thumb {% if forloop.first %}gallery__thumb--active{% endif %}"
+                    <img class="gallery__thumb {% if not steam_data.trailers and forloop.first %}gallery__thumb--active{% endif %}"
                          src="{{ screenshot }}"
                          alt="Скриншот {{ forloop.counter }}"
+                         data-type="image"
+                         data-src="{{ screenshot }}"
                          onclick="gallerySelect(this)">
                 {% endfor %}
             </div>
@@ -94,7 +118,7 @@
                 {% endif %}
                 {% if steam_data.requirements_recommended %}
                     <div class="requirements__column">
-                        <h3>Рекомендуемые</h3>
+                        <h3>Рекомендованные</h3>
                         {{ steam_data.requirements_recommended|safe }}
                     </div>
                 {% endif %}
@@ -200,14 +224,68 @@
 <script src="{% static 'js/csrf.js' %}"></script>
 <script src="{% static 'js/deferred.js' %}"></script>
 <script src="{% static 'js/like.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <script>
+function setupGalleryVideo(video, src, videoType) {
+    const isHls = videoType === 'application/vnd.apple.mpegurl' || src.includes('.m3u8');
+
+    if (isHls) {
+        if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            video.src = src;
+        } else if (window.Hls && Hls.isSupported()) {
+            const hls = new Hls();
+            hls.loadSource(src);
+            hls.attachMedia(video);
+        }
+        return;
+    }
+
+    const source = document.createElement('source');
+    source.src = src;
+    source.type = videoType || 'video/mp4';
+    video.appendChild(source);
+}
+
 function gallerySelect(thumb) {
-    document.getElementById('gallery-main').src = thumb.src;
+    const wrap = document.getElementById('gallery-main-wrap');
+    const type = thumb.dataset.type;
+    const src = thumb.dataset.src || thumb.src;
+
+    if (type === 'video') {
+        const video = document.createElement('video');
+
+        video.className = 'gallery__active';
+        video.id = 'gallery-main';
+        video.controls = true;
+        video.autoplay = true;
+        video.poster = thumb.dataset.poster || thumb.src;
+
+        setupGalleryVideo(video, src, thumb.dataset.videoType || 'video/mp4');
+        wrap.replaceChildren(video);
+    } else {
+        const image = document.createElement('img');
+
+        image.className = 'gallery__active';
+        image.id = 'gallery-main';
+        image.src = src;
+        image.alt = thumb.alt || 'Скриншот';
+
+        wrap.replaceChildren(image);
+    }
+
     document.querySelectorAll('.gallery__thumb').forEach(function(t) {
         t.classList.remove('gallery__thumb--active');
     });
     thumb.classList.add('gallery__thumb--active');
     thumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const video = document.querySelector('#gallery-main[data-src]');
+
+    if (video) {
+        setupGalleryVideo(video, video.dataset.src, video.dataset.videoType || 'video/mp4');
+    }
+});
 </script>
 {% endblock %}
