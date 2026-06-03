@@ -3,9 +3,13 @@
 /* ── VARIABLES ─────────────────────────────────────────── */
 :root {
   --bg:            #121212;
-  --sidebar-bg:    #0D0D1A;
-  --card-bg:       #1A1A2E;
-  --card-border:   #2A2A3E;
+  --sidebar-bg:    rgba(13, 13, 26, .72);
+  --card-bg:       rgba(26, 26, 46, .58);
+  --card-border:   rgba(255, 255, 255, .10);
+  --glass-bg:      rgba(26, 26, 46, .58);
+  --glass-strong:  rgba(13, 13, 26, .78);
+  --glass-border:  rgba(255, 255, 255, .12);
+  --glass-shadow:  0 18px 48px rgba(0, 0, 0, .32), inset 0 1px 0 rgba(255, 255, 255, .08);
   --primary:       #885CF6;
   --primary-h:     #7048E8;
   --primary-dim:   rgba(136,92,246,.15);
@@ -224,6 +228,103 @@ body {
   background: rgba(136,92,246,.1);
   border: 1px solid rgba(136,92,246,.25);
   color: var(--primary);
+}
+
+/* ── GLASS SURFACES ─────────────────────────────────────── */
+.sidebar,
+.topbar,
+.topbar__search,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="date"],
+input[type="datetime-local"],
+input[type="number"],
+textarea,
+select,
+.messages p,
+.auth-card,
+.banned,
+.widget,
+.feed__item,
+.feed__review-game,
+.post-list__filter,
+.post-list__item,
+.like-btn,
+.comments__item,
+.genre-filter,
+.sort-toggle,
+.game-card,
+.game-detail__genre,
+.game-description,
+.requirements,
+.requirements__column,
+.avg-rating,
+.reviews-list__item,
+.profile__header,
+.profile__posts,
+.profile__reviews,
+.profile__steam,
+.search li,
+.search__cookie-notice,
+.moderation__filters,
+.moderation__table,
+.post-images-preview__img,
+.post-images-existing__item img {
+  border-color: var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(18px) saturate(135%);
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+}
+
+.topbar,
+.sidebar,
+.requirements__column,
+.feed__review-game,
+.moderation__table th {
+  background: var(--glass-strong);
+}
+
+.game-card,
+.feed__item,
+.post-list__item,
+.widget,
+.game-description,
+.requirements,
+.reviews-list__item,
+.profile__header,
+.profile__posts,
+.profile__reviews,
+.profile__steam {
+  position: relative;
+  overflow: hidden;
+}
+
+.game-card::before,
+.feed__item::before,
+.post-list__item::before,
+.widget::before,
+.game-description::before,
+.requirements::before,
+.reviews-list__item::before,
+.profile__header::before,
+.profile__posts::before,
+.profile__reviews::before,
+.profile__steam::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgba(255,255,255,.10), transparent 36%);
+  opacity: .45;
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root {
+    --sidebar-bg: #0D0D1A;
+    --card-bg: #1A1A2E;
+    --card-border: #2A2A3E;
+  }
 }
 
 /* ── BUTTONS ────────────────────────────────────────────── */
