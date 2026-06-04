@@ -5,7 +5,7 @@ from users.models import User, Profile
 
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(required=True)
-    username = forms.CharField(required=True)
+    username = forms.CharField(required=True, label='Имя пользователя')
 
     class Meta:
         model = User
