@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Steam-игры {{ profile_user.username }} — Igrovorot{% endblock %}
+
+{% block content %}
+<div class="steam-page">
+    <div class="steam-page__head">
+        <div>
+            <h1>Steam-игры {{ profile_user.username }}</h1>
+            {% if profile.steam_id %}
+                <p>Игры отсортированы по времени в Steam.</p>
+            {% endif %}
+        </div>
+        <a href="{% url 'profile' profile_user.username %}" class="btn btn--ghost btn--sm">Назад в профиль</a>
+    </div>
+
+    {% if profile.steam_id %}
+        {% if steam_games %}
+            <div class="steam-cards steam-cards--list">
+                {% for game in steam_games %}
+                    {% if game.game_slug %}
+                        <a href="{% url 'game_detail' game.game_slug %}" class="steam-card">
+                    {% else %}
+                        <a href="{% url 'steam_game_redirect' game.appid %}" class="steam-card">
+                    {% endif %}
+                        {% if game.cover_url %}
+                            <img class="steam-card__cover" src="{{ game.cover_url }}" alt="">
+                        {% else %}
+                            <div class="steam-card__cover steam-card__cover--placeholder"></div>
+                        {% endif %}
+                        <div class="steam-card__body">
+                            <span class="steam-card__title">{{ game.name }}</span>
+                            <span class="steam-card__time">{{ game.playtime_hours }} ч.</span>
+                        </div>
+                    {% if game.game_slug %}
+                        </a>
+                    {% else %}
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="profile__empty">Не удалось загрузить библиотеку. Возможно профиль Steam закрытый.</p>
+        {% endif %}
+    {% else %}
+        <p class="profile__empty">Steam-профиль не указан.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -14,7 +14,7 @@ from users.models import User, Profile
 from posts.models import Post
 from social.models import Follow
 from reviews.models import Review
-from users.steam import resolve_steam_id, get_steam_games
+from users.steam import build_steam_profile_url, resolve_steam_id, get_steam_games
 
 
 
@@ -116,7 +116,9 @@ class ProfileView(View):
             Follow.objects.filter(follower=request.user, following=profile_user).exists()
         )
         steam_games = []
+        steam_profile_url = ''
         if profile.steam_id:
+            steam_profile_url = build_steam_profile_url(profile.steam_id)
             steam_id = resolve_steam_id(profile.steam_id)
             if steam_id:
                 steam_games = get_steam_games(steam_id)
@@ -128,6 +130,27 @@ class ProfileView(View):
             'followers_count': followers_count,
             'following_count': following_count,
             'is_following': is_following,
+            'steam_games': steam_games,
+            'steam_profile_url': steam_profile_url,
+        })
+
+
+class SteamGamesView(View):
+    template_name = 'users/steam_games.html'
+
+    def get(self, request, username):
+        profile_user = get_object_or_404(User, username=username)
+        profile, _ = Profile.objects.get_or_create(user=profile_user)
+        steam_games = []
+
+        if profile.steam_id:
+            steam_id = resolve_steam_id(profile.steam_id)
+            if steam_id:
+                steam_games = get_steam_games(steam_id)
+
+        return render(request, self.template_name, {
+            'profile_user': profile_user,
+            'profile': profile,
             'steam_games': steam_games,
         })
 

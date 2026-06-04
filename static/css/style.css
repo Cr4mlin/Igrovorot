@@ -65,21 +65,29 @@ body {
 }
 .sidebar__logo {
   height: var(--topbar-h);
-  padding: 0 24px;
+  padding: 0;
   display: flex;
   align-items: center;
+  justify-content: center;
   flex-shrink: 0;
   cursor: pointer;
   user-select: none;
 }
 .sidebar__logo-icon { display: none; color: var(--text-muted); }
 .sidebar__logo a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 15px;
   font-weight: 700;
   letter-spacing: 3px;
   color: var(--primary);
   font-family: var(--mono);
 }
+.sidebar__logo-full {
+    height: 40px;
+    width: auto;
+  }
 .sidebar__nav {
   flex: 1;
   padding: 16px 12px;
@@ -265,6 +273,7 @@ select,
 .profile__posts,
 .profile__reviews,
 .profile__steam,
+.steam-card,
 .search li,
 .search__cookie-notice,
 .moderation__filters,
@@ -295,7 +304,8 @@ select,
 .profile__header,
 .profile__posts,
 .profile__reviews,
-.profile__steam {
+.profile__steam,
+.steam-card {
   position: relative;
   overflow: hidden;
 }
@@ -310,7 +320,8 @@ select,
 .profile__header::before,
 .profile__posts::before,
 .profile__reviews::before,
-.profile__steam::before {
+.profile__steam::before,
+.steam-card::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -1052,6 +1063,20 @@ textarea { min-height: 110px; resize: vertical; }
   font-size: 14px; font-weight: 600; margin-bottom: 14px;
   color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px;
 }
+.profile__section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.profile__section-head h2 { margin-bottom: 0; }
+.profile__section-head a {
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 600;
+}
+.profile__section-head a:hover { text-decoration: underline; }
 .profile__list { display: flex; flex-direction: column; gap: 2px; }
 .profile__list-item {
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
@@ -1069,6 +1094,98 @@ textarea { min-height: 110px; resize: vertical; }
 .steam-table td { padding: 8px 4px; font-size: 13px; color: var(--text-muted); border-bottom: 1px solid var(--card-border); }
 .steam-table__game { display: flex; align-items: center; gap: 10px; }
 .steam-table tr:last-child td { border-bottom: none; }
+.steam-page { max-width: 980px; }
+.steam-page__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.steam-page__head h1 {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.steam-page__head p {
+  color: var(--text-dim);
+  font-size: 13px;
+}
+.steam-cards {
+  display: grid;
+  gap: 12px;
+}
+.steam-cards--compact {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.steam-cards--list {
+  grid-template-columns: 1fr;
+}
+.steam-card {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  transition: border-color .2s, transform .2s;
+}
+.steam-cards--list .steam-card {
+  flex-direction: row;
+  align-items: center;
+}
+a.steam-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+.steam-card__cover {
+  width: 100%;
+  aspect-ratio: 16/7;
+  display: block;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.steam-cards--list .steam-card__cover {
+  width: 220px;
+  height: 86px;
+  aspect-ratio: auto;
+}
+.steam-card__cover--placeholder {
+  background: linear-gradient(135deg, var(--card-border), var(--sidebar-bg));
+}
+.steam-card__icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 7px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.steam-card__icon--placeholder {
+  background: var(--card-border);
+}
+.steam-card__body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+}
+.steam-card__title {
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.steam-card__time {
+  color: var(--secondary);
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--mono);
+}
 
 /* ── FOLLOW BUTTON ──────────────────────────────────────── */
 .follow-btn {
@@ -1248,6 +1365,7 @@ body.mobile-menu-open .sidebar-overlay { display: block; }
   .profile__content { grid-template-columns: 1fr; }
   .profile__steam   { grid-column: auto; }
   .games-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+  .steam-cards--compact { grid-template-columns: 1fr; }
 }
 
 /* ── RESPONSIVE 768px (планшет) ─────────────────────────── */
@@ -1303,6 +1421,9 @@ body.mobile-menu-open .sidebar-overlay { display: block; }
 
   .profile__header { flex-direction: column; align-items: flex-start; gap: 14px; }
   .profile__avatar { width: 64px; height: 64px; font-size: 24px; }
+  .steam-page__head { flex-direction: column; }
+  .steam-cards--list .steam-card { flex-direction: column; align-items: stretch; }
+  .steam-cards--list .steam-card__cover { width: 100%; height: auto; aspect-ratio: 16/7; }
 
   .auth-card { padding: 24px 20px; margin: 16px; }
 

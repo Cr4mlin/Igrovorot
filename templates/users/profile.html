@@ -53,6 +53,9 @@
             {% else %}
                 <a href="{% url 'login' %}" class="btn btn--primary btn--sm">Войдите, чтобы подписаться</a>
             {% endif %}
+            {% if steam_profile_url %}
+                <a href="{{ steam_profile_url }}" target="_blank" rel="noopener" class="btn btn--secondary btn--sm">Открыть Steam</a>
+            {% endif %}
             </div>
         </div>
     </div>
@@ -94,29 +97,36 @@
 
         {% if profile.steam_id %}
         <section class="profile__steam">
-            <h2>Библиотека Steam</h2>
+            <div class="profile__section-head">
+                <h2>Часы в играх</h2>
+                {% if steam_games %}
+                    <a href="{% url 'profile_steam_games' profile_user.username %}">Все игры</a>
+                {% endif %}
+            </div>
             {% if steam_games %}
-                <table class="steam-table">
-                    <thead>
-                        <tr>
-                            <th>Игра</th>
-                            <th>Наиграно</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for game in steam_games %}
-                        <tr>
-                            <td class="steam-table__game">
-                                {% if game.icon_url %}
-                                    <img src="{{ game.icon_url }}" alt="" width="32" height="32">
-                                {% endif %}
-                                <span>{{ game.name }}</span>
-                            </td>
-                            <td>{{ game.playtime_hours }} ч.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <div class="steam-cards steam-cards--compact">
+                    {% for game in steam_games|slice:":3" %}
+                        {% if game.game_slug %}
+                            <a href="{% url 'game_detail' game.game_slug %}" class="steam-card">
+                        {% else %}
+                            <a href="{% url 'steam_game_redirect' game.appid %}" class="steam-card">
+                        {% endif %}
+                            {% if game.cover_url %}
+                                <img class="steam-card__cover" src="{{ game.cover_url }}" alt="">
+                            {% else %}
+                                <div class="steam-card__cover steam-card__cover--placeholder"></div>
+                            {% endif %}
+                            <div class="steam-card__body">
+                                <span class="steam-card__title">{{ game.name }}</span>
+                                <span class="steam-card__time">{{ game.playtime_hours }} ч.</span>
+                            </div>
+                        {% if game.game_slug %}
+                            </a>
+                        {% else %}
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
             {% else %}
                 <p class="profile__empty">Не удалось загрузить библиотеку. Возможно профиль Steam закрытый.</p>
             {% endif %}

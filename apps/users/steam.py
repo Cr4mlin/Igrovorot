@@ -2,6 +2,7 @@ import re
 import requests
 from django.conf import settings
 
+from games.models import Game
 from games.steam import sync_steam_owned_games
 
 
@@ -28,6 +29,29 @@ def resolve_steam_id(steam_input):
         return resolve_vanity_url(username)
 
     return resolve_vanity_url(steam_input)
+
+
+def build_steam_profile_url(steam_input):
+    if not steam_input:
+        return ''
+
+    steam_input = steam_input.strip()
+
+    if steam_input.startswith(('http://', 'https://')):
+        return steam_input
+
+    match = re.search(r'/profiles/(\d{17})', steam_input)
+    if match:
+        return f"https://steamcommunity.com/profiles/{match.group(1)}/"
+
+    match = re.search(r'/id/([^/]+)', steam_input)
+    if match:
+        return f"https://steamcommunity.com/id/{match.group(1).strip('/')}/"
+
+    if re.match(r'^\d{17}$', steam_input):
+        return f'https://steamcommunity.com/profiles/{steam_input}/'
+
+    return f'https://steamcommunity.com/id/{steam_input.strip("/")}/'
 
 
 def resolve_vanity_url(username):
@@ -64,13 +88,23 @@ def get_steam_games(steam_id):
         except Exception:
             pass
 
+        game_slugs = {
+            game.steam_app_id: game.slug
+            for game in Game.objects.filter(
+                steam_app_id__in=[game.get('appid') for game in visible_games if game.get('appid')]
+            )
+        }
+
         result = []
         for game in visible_games:
             playtime = game.get('playtime_forever', 0)
+            app_id = game.get('appid')
             result.append({
                 'name': game.get('name', ''),
-                'appid': game.get('appid'),
+                'appid': app_id,
+                'game_slug': game_slugs.get(app_id),
                 'playtime_hours': round(playtime / 60, 1),
+                'cover_url': f'https://cdn.akamai.steamstatic.com/steam/apps/{app_id}/header.jpg',
                 'icon_url': f"https://media.steampowered.com/steamcommunity/public/images/apps/{game['appid']}/{game.get('img_icon_url', '')}.jpg" if game.get(
                     'img_icon_url') else None,
             })

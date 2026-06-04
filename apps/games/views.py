@@ -7,7 +7,7 @@ from django.views.decorators.cache import never_cache
 from django.core.paginator import Paginator
 from django.db.models import Avg, F
 from games.models import Game, Genre
-from games.steam import get_steam_game_details
+from games.steam import create_steam_game, get_steam_game_details
 from reviews.models import Review
 from reviews.forms import ReviewForm
 
@@ -80,6 +80,15 @@ class GameDeleteView(View):
         game = get_object_or_404(Game, slug=slug)
         game.delete()
         return redirect('games')
+
+
+class SteamGameRedirectView(View):
+    def get(self, request, app_id):
+        game = create_steam_game(app_id)
+        if not game:
+            return redirect('games')
+
+        return redirect('game_detail', slug=game.slug)
 
 
 class GameDetailView(View):
